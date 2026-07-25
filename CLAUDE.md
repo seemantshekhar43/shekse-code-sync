@@ -77,7 +77,8 @@ Conventions:
 - Co-locate unit tests next to source as `*.test.ts`; keep them DB- and network-free (mock `packages/ai`, Octokit, Prisma).
 - Integration tests that need a DB use a disposable Postgres (Docker/testcontainers) and a separate test database - never the dev DB.
 - E2E lives in `apps/web/e2e` and `apps/extension/e2e`.
-- **Before marking work done, verify the actual behavior end-to-end** (drive the real flow via the `verify`/`run` skills), not just green unit tests. A green test suite is necessary, not sufficient.
+- **Chrome UI testing:** verify any UI change to the web dashboard or the extension's on-page behavior by driving a real Chrome session with the `chrome-devtools-axi` skill (navigate, snapshot, click, fill, read console/network, screenshot) against the running app - don't sign off UI work on typecheck/build alone.
+- **Before marking work done, verify the actual behavior end-to-end** (drive the real flow via the `verify`/`run`/`chrome-devtools-axi` skills), not just green unit tests. A green test suite is necessary, not sufficient.
 - Don't close an issue / mark a task done while typecheck, lint, or tests fail.
 
 ## Conventions
