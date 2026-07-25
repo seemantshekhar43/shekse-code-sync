@@ -40,6 +40,29 @@ export const CaptureSubmission = z.object({
 });
 export type CaptureSubmission = z.infer<typeof CaptureSubmission>;
 
+/** Enrichment lifecycle of a submission's AI analysis. */
+export const EnrichmentStatus = z.enum(["pending", "done", "failed"]);
+export type EnrichmentStatus = z.infer<typeof EnrichmentStatus>;
+
+/** Row shape returned by the list endpoint and rendered on the dashboard. */
+export const SubmissionSummary = z.object({
+  id: z.string(),
+  title: z.string(),
+  slug: z.string(),
+  questionLink: z.string(),
+  platform: Platform,
+  level: Level,
+  language: z.string(),
+  status: SubmissionStatus,
+  tags: z.array(z.string()),
+  topics: z.array(z.string()),
+  isMarkedForRevision: z.boolean(),
+  enrichment: EnrichmentStatus,
+  pattern: z.string().nullable(),
+  solvedAt: z.coerce.date(),
+});
+export type SubmissionSummary = z.infer<typeof SubmissionSummary>;
+
 /** AI-derived enrichment produced by the worker. */
 export const Analysis = z.object({
   timeComplexity: z.string(), // e.g. "O(n log n)"

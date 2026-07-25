@@ -1,12 +1,23 @@
 import { Injectable } from "@nestjs/common";
 import { prisma } from "@scs/db";
 import { buildSubmissionFiles, slugify } from "@scs/github";
-import type { CaptureSubmission } from "@scs/types";
+import type { CaptureSubmission, SubmissionSummary } from "@scs/types";
 import { QueueService } from "../queue/queue.service.js";
+import { toSummary } from "./submissions.mapper.js";
 
 @Injectable()
 export class SubmissionsService {
   constructor(private readonly queue: QueueService) {}
+
+  /** List a user's submissions for the dashboard, newest first. */
+  async list(userId: string): Promise<SubmissionSummary[]> {
+    const rows = await prisma.submission.findMany({
+      where: { userId },
+      orderBy: { solvedAt: "desc" },
+      include: { analysis: { select: { pattern: true } } },
+    });
+    return rows.map(toSummary);
+  }
 
   /**
    * Capture flow: write the metadata row + (TODO) commit to GitHub, then
