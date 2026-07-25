@@ -12,10 +12,19 @@ ShekseCodeSync captures every DSA problem solved on LeetCode / NeetCode, version
 
 ## Working pattern (follow this on every task)
 
-1. **Track work as tasks.** Break work into tasks, keep exactly one `in_progress` at a time, and mark each `completed` the moment it's actually done. Add follow-up tasks as they surface.
-2. **Keep the decision log current.** When a significant decision is made, append it to `docs/DECISIONS.md`.
-3. **Commit and push through GitHub.** After a coherent unit of work, commit with a clear message and push. Use the **gh-axi** skill for all GitHub operations (repos, PRs, issues, CI) rather than raw `gh`.
-4. **Branch, don't commit to the default branch directly** for feature work; open a PR.
+Work is tracked as **GitHub issues**. For each unit of work:
+
+1. **Create the issue first.** Open a GitHub issue describing the task before starting. Use the **gh-axi** skill for all GitHub operations (issues, repos, PRs, CI) rather than raw `gh`:
+   `npx -y gh-axi issue create --title "..." --body "..."` → note the issue number.
+2. **Act on it.** For feature work, branch off `main` (e.g. `git checkout -b feat/<slug>`); trivial repo-hygiene work may go straight on `main`.
+3. **Close it from the commit message.** Reference the issue in the commit so the push closes it automatically:
+   ```
+   git commit -m "Scaffold monorepo
+
+   Closes #6"
+   ```
+   Use `Closes #N` / `Fixes #N` so the commit both does the work and closes the task. On a branch, put `Closes #N` in the commit or the PR body; the issue closes when the PR merges to `main`.
+4. **Keep the decision log current.** When a significant decision is made, append it to `docs/DECISIONS.md`.
 5. Don't push or perform outward-facing actions without the work being complete and, where it's a new external action, confirmed.
 
 ## Stack quick reference
