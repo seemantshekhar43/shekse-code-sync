@@ -1,0 +1,28 @@
+{
+  "name": "@scs/extension",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "postinstall": "wxt prepare",
+    "typecheck": "wxt prepare && tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint entrypoints"
+  },
+  "dependencies": {
+    "@scs/types": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.9",
+    "@types/react-dom": "^18.3.0",
+    "@wxt-dev/module-react": "^1.1.3",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.1",
+    "wxt": "^0.19.13"
+  }
+}

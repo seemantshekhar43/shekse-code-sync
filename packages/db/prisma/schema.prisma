@@ -1,0 +1,103 @@
+// Prisma schema for ShekseCodeSync.
+// GitHub is the source of truth for content; this DB is the queryable index.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Platform {
+  leetcode
+  neetcode
+  manual
+}
+
+enum Level {
+  easy
+  medium
+  hard
+}
+
+enum SubmissionStatus {
+  accepted
+  wrong
+  tle
+  runtime_error
+}
+
+enum EnrichmentStatus {
+  pending
+  done
+  failed
+}
+
+model User {
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+  // GitHub App install + repo this user syncs to
+  githubInstallationId String?
+  githubRepo           String?
+  submissions          Submission[]
+  createdAt            DateTime     @default(now()) @map("created_at")
+}
+
+model Submission {
+  id           String           @id @default(cuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  slug         String // folder name in the GitHub repo
+  questionLink String
+  platform     Platform
+  level        Level
+  language     String
+  status       SubmissionStatus
+  tags         String[]
+  topics       String[]
+  companies    String[]
+  runtimeMs    Int?
+  memoryKb     Int?
+  isMarkedForRevision Boolean   @default(false)
+  attemptCount Int              @default(1)
+  repoPath     String? // path to the folder in GitHub
+  enrichment   EnrichmentStatus @default(pending)
+  analysis     Analysis?
+  revisions    RevisionAttempt[]
+  solvedAt     DateTime
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  @@unique([userId, slug])
+  @@index([userId, level])
+  @@index([userId, platform])
+}
+
+model Analysis {
+  id                String     @id @default(cuid())
+  submissionId      String     @unique
+  submission        Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  timeComplexity    String
+  spaceComplexity   String
+  pattern           String
+  optimizationNotes String
+  createdAt         DateTime   @default(now()) @map("created_at")
+}
+
+model RevisionAttempt {
+  id           String     @id @default(cuid())
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  // Anki-style spaced-repetition fields (v2)
+  selfRating   Int // 0-5
+  ease         Float      @default(2.5)
+  intervalDays Int        @default(1)
+  dueAt        DateTime
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([dueAt])
+}
