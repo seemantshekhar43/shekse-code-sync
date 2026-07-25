@@ -1,0 +1,320 @@
+<html data-theme="luxury" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShekseCodeSync — Tech Stack</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, li, dd, td, th, .badge, code) { overflow-wrap: anywhere; }
+  :where(img, svg) { max-width: 100%; height: auto; }
+  html { scroll-behavior: smooth; }
+  .eyebrow { letter-spacing: .18em; text-transform: uppercase; font-size: .7rem; }
+  .mermaid { background: transparent; }
+</style>
+</head>
+<body class="bg-base-100 text-base-content">
+
+<div class="navbar bg-base-200/80 sticky top-0 z-30 backdrop-blur border-b border-base-content/10 px-4 lg:px-8">
+  <div class="navbar-start gap-2">
+    <span class="text-2xl">🧱</span>
+    <a class="font-bold text-lg tracking-tight">ShekseCodeSync</a>
+    <span class="badge badge-soft badge-secondary badge-sm hidden sm:inline-flex">Tech Stack v0.1</span>
+  </div>
+  <div class="navbar-end hidden lg:flex">
+    <ul class="menu menu-horizontal gap-1 text-sm">
+      <li><a href="#glance">At a glance</a></li>
+      <li><a href="#layers">Layers</a></li>
+      <li><a href="#topology">Topology</a></li>
+      <li><a href="#decisions">Choices</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="mx-auto max-w-6xl px-4 lg:px-8 pb-24">
+
+  <!-- HERO -->
+  <section class="pt-12 pb-6">
+    <p class="eyebrow text-secondary mb-3">Technical Design</p>
+    <h1 class="text-4xl lg:text-5xl font-bold tracking-tight leading-[1.08]">
+      One language, end to end.<br>
+      <span class="text-secondary">TypeScript everywhere.</span>
+    </h1>
+    <p class="mt-5 max-w-3xl text-lg text-base-content/70">
+      The browser plugin <b>must</b> be JS/TS, and your data model is shared across plugin, API, worker, and dashboard.
+      Picking TypeScript across the board means one type definition of a "submission" flows through the whole system - the single biggest maintainability win available here. Everything below follows from that.
+    </p>
+    <div class="mt-5 flex flex-wrap gap-2">
+      <span class="badge badge-lg badge-outline">TypeScript monorepo</span>
+      <span class="badge badge-lg badge-outline">NestJS API + worker</span>
+      <span class="badge badge-lg badge-outline">Postgres + Prisma</span>
+      <span class="badge badge-lg badge-outline">BullMQ / Redis</span>
+      <span class="badge badge-lg badge-outline">Next.js dashboard</span>
+      <span class="badge badge-lg badge-outline">Claude Opus 4.8</span>
+      <span class="badge badge-lg badge-outline">Docker Compose</span>
+    </div>
+  </section>
+
+  <div class="alert alert-soft alert-info mb-10 text-sm">
+    <span>🔗 <b>How this maps to your locked decisions:</b> multi-user → Auth.js + per-user data scoping · GitHub SoT → Octokit + GitHub App · async AI → BullMQ worker · self-hosted Docker → one compose file · SRS (v2) → dedicated schema. Every choice traces back to something you already decided.</span>
+  </div>
+
+  <!-- AT A GLANCE -->
+  <section id="glance" class="mb-14 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3"><span class="text-secondary">01</span> The stack at a glance</h2>
+    <p class="text-base-content/60 mb-5 text-sm max-w-2xl">Recommended pick per layer, with the leading alternative. Rationale and trade-offs are in section 02.</p>
+    <div class="overflow-x-auto rounded-box border border-base-content/10">
+      <table class="table table-zebra">
+        <thead><tr><th>Layer</th><th>Recommended</th><th>Alternative</th><th>Why the pick</th></tr></thead>
+        <tbody>
+          <tr><td>Language</td><td><span class="badge badge-secondary badge-soft">TypeScript</span></td><td>—</td><td class="text-xs text-base-content/70">Forced by the extension; shared types everywhere</td></tr>
+          <tr><td>Monorepo</td><td><b>pnpm workspaces + Turborepo</b></td><td>Nx</td><td class="text-xs text-base-content/70">Share <code>@scs/types</code> across all apps</td></tr>
+          <tr><td>Browser plugin</td><td><b>WXT</b> + React</td><td>Plasmo</td><td class="text-xs text-base-content/70">Best-maintained MV3 framework, cross-browser</td></tr>
+          <tr><td>Backend API</td><td><b>NestJS</b></td><td>Fastify</td><td class="text-xs text-base-content/70">Structured, DI, scales as domains grow</td></tr>
+          <tr><td>Database</td><td><b>PostgreSQL</b></td><td>SQLite</td><td class="text-xs text-base-content/70">Concurrent writes, JSON, full-text search</td></tr>
+          <tr><td>ORM</td><td><b>Prisma</b></td><td>Drizzle</td><td class="text-xs text-base-content/70">Type-safe, great migrations &amp; DX</td></tr>
+          <tr><td>Job queue</td><td><b>BullMQ</b> + Redis</td><td>pg-boss</td><td class="text-xs text-base-content/70">Robust retries, rate-limit, dashboard</td></tr>
+          <tr><td>AI layer</td><td><b>Vercel AI SDK</b> · default <code>claude-opus-4-8</code></td><td>OpenAI-compatible proxy (LiteLLM)</td><td class="text-xs text-base-content/70">Provider-agnostic - swap model by config, no lock-in</td></tr>
+          <tr><td>Frontend</td><td><b>Next.js</b> + Tailwind + shadcn/ui</td><td>Vite + React</td><td class="text-xs text-base-content/70">SSR dashboard, mature ecosystem</td></tr>
+          <tr><td>Editors</td><td><b>CodeMirror 6</b></td><td>Monaco</td><td class="text-xs text-base-content/70">Lighter; handles markdown + code</td></tr>
+          <tr><td>Charts</td><td><b>Recharts</b></td><td>visx</td><td class="text-xs text-base-content/70">Fast to build dashboard insights</td></tr>
+          <tr><td>Auth</td><td><b>Auth.js (NextAuth v5)</b></td><td>Lucia</td><td class="text-xs text-base-content/70">GitHub OAuth login, self-hostable</td></tr>
+          <tr><td>GitHub writes</td><td><b>Octokit + GitHub App</b></td><td>PAT (fallback)</td><td class="text-xs text-base-content/70">Matches §08 of the PRD</td></tr>
+          <tr><td>Packaging</td><td><b>Docker + docker-compose</b></td><td>—</td><td class="text-xs text-base-content/70">web · api · worker · postgres · redis</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- LAYERS -->
+  <section id="layers" class="mb-14 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span class="text-secondary">02</span> Layer-by-layer rationale</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">🧩 Browser plugin — WXT</h3>
+          <p class="text-sm text-base-content/75">Modern Manifest V3 framework: TypeScript, HMR, and one codebase that builds for Chrome + Firefox. Content script scrapes the LeetCode/NeetCode submission (it uses a GraphQL API we can read); popup is React for the "Pull &amp; Send" and manual capture UI. Plugin holds only a ShekseCodeSync token and POSTs to our API.</p>
+        </div>
+      </div>
+
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">⚙️ API + worker — NestJS</h3>
+          <p class="text-sm text-base-content/75">Two processes from one codebase: the <b>API</b> handles capture/dashboard/auth; the <b>worker</b> drains the BullMQ queue for AI enrichment. NestJS's modules + DI keep a multi-domain, multi-user backend organized as it grows. Fastify is the lighter alternative if you'd rather stay minimal - but structure pays off here.</p>
+        </div>
+      </div>
+
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">🗄️ Postgres + Prisma</h3>
+          <p class="text-sm text-base-content/75">Postgres handles concurrent writes (API + worker both write), JSONB for flexible metadata, and native full-text search for the dashboard. Prisma gives type-safe queries and first-class migrations. SQLite is tempting for a homelab, but multi-user + a worker pool make Postgres the durable call.</p>
+        </div>
+      </div>
+
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">🔁 BullMQ + Redis</h3>
+          <p class="text-sm text-base-content/75">The async-AI decision needs a real queue. BullMQ is TS-native with retries, backoff, rate-limiting, and a ready-made dashboard (bull-board) - exactly what "fire-and-forget, retry on failure" wants. Redis is a tiny extra container and doubles as a cache/session store. <code>pg-boss</code> (queue-on-Postgres, no Redis) is the fewer-containers alternative.</p>
+        </div>
+      </div>
+
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">🤖 AI layer — provider-agnostic</h3>
+          <p class="text-sm text-base-content/75">Your call: no vendor lock-in. The worker talks to a <b>Vercel AI SDK</b> (<code>ai</code>) unified interface behind our own tiny <code>AiProvider</code> in <code>packages/ai</code>. Swapping model = changing one env var, not code. <code>generateObject</code> + a Zod schema gives structured complexity/pattern/optimization output <b>across providers</b>. Default <code>claude-opus-4-8</code>; drop-in adapters for OpenAI, Google, or a local <b>Ollama</b> model on your homelab.</p>
+          <div class="alert alert-soft alert-warning mt-2 text-xs"><span>⚖️ Honest trade-off: a <b>pure OpenAI-compatible wire format</b> (code against the OpenAI SDK + a LiteLLM proxy) is maximally portable but lowest-common-denominator - you lose provider-native features (Claude's structured outputs, thinking). The AI SDK keeps portability <i>and</i> native strengths, so it's the better "no lock-in" answer. See the callout below.</span></div>
+        </div>
+      </div>
+
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">📊 Frontend — Next.js</h3>
+          <p class="text-sm text-base-content/75">App Router + React for the dashboard, Tailwind + shadcn/ui for a clean owned component set, TanStack Query for data fetching, Recharts for insights (streaks, topic coverage, heatmap). <b>CodeMirror 6</b> powers both the markdown question editor and the code editor in the manual-entry form.</p>
+        </div>
+      </div>
+
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">🔐 Auth — Auth.js + GitHub App</h3>
+          <p class="text-sm text-base-content/75">Auth.js (NextAuth v5) handles multi-user login via <b>GitHub OAuth</b>. Separately, each user installs the <b>GitHub App</b> (Octokit) on their repo during onboarding - the backend mints short-lived per-commit tokens, exactly as designed in PRD §08. Plugin tokens are issued from the dashboard.</p>
+        </div>
+      </div>
+
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">🐳 Packaging — Docker Compose</h3>
+          <p class="text-sm text-base-content/75">One <code>docker-compose.yml</code> brings up five services - <code>web</code>, <code>api</code>, <code>worker</code>, <code>postgres</code>, <code>redis</code> - on your homelab. The extension builds to a zip you load/publish separately. Config (GitHub App key, AI provider + key) via <code>.env</code>.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- REPO SHAPE -->
+  <section class="mb-14">
+    <h2 class="text-2xl font-bold mb-4 flex items-center gap-3"><span class="text-secondary">03</span> Monorepo shape</h2>
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div class="mockup-code text-xs bg-base-300">
+<pre data-prefix=""><code>shekse-code-sync/</code></pre>
+<pre data-prefix=""><code>  apps/</code></pre>
+<pre data-prefix=""><code>    extension/   # WXT + React (MV3)</code></pre>
+<pre data-prefix=""><code>    api/         # NestJS HTTP API</code></pre>
+<pre data-prefix=""><code>    worker/      # NestJS AI-enrichment worker</code></pre>
+<pre data-prefix=""><code>    web/         # Next.js dashboard</code></pre>
+<pre data-prefix=""><code>  packages/</code></pre>
+<pre data-prefix=""><code>    types/       # @scs/types - shared DTOs</code></pre>
+<pre data-prefix=""><code>    db/          # Prisma schema + client</code></pre>
+<pre data-prefix=""><code>    ai/          # AiProvider interface + adapters</code></pre>
+<pre data-prefix=""><code>    github/      # Octokit / GitHub App helpers</code></pre>
+<pre data-prefix=""><code>  docker-compose.yml</code></pre>
+      </div>
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="font-bold text-sm mb-1">Why this shape</h3>
+          <ul class="text-xs text-base-content/75 space-y-1">
+            <li>• <b><code>packages/types</code></b> is the single source of truth for a "submission" - imported by extension, api, worker, and web. Change it once, everything type-checks.</li>
+            <li>• <b><code>packages/db</code></b> keeps Prisma schema shared between api and worker (both write).</li>
+            <li>• <b><code>packages/ai</code></b> isolates the provider swap (Claude ↔ Ollama) behind one interface.</li>
+            <li>• Turborepo caches builds so CI and local installs stay fast.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI PORTABILITY -->
+  <section class="mb-14">
+    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3"><span class="text-secondary">3b</span> No AI vendor lock-in</h2>
+    <p class="text-base-content/60 mb-5 text-sm max-w-2xl">Your question, answered: the model is a config value, not a dependency baked into the code. One interface, many providers.</p>
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div class="mockup-code text-xs bg-base-300">
+<pre data-prefix=""><code>// packages/ai - one interface</code></pre>
+<pre data-prefix=""><code>interface AiProvider {</code></pre>
+<pre data-prefix=""><code>  analyze(sol): Promise&lt;Analysis&gt;</code></pre>
+<pre data-prefix=""><code>}</code></pre>
+<pre data-prefix=""><code></code></pre>
+<pre data-prefix=""><code>// swap by env - no code change</code></pre>
+<pre data-prefix=""><code>AI_PROVIDER=anthropic</code></pre>
+<pre data-prefix=""><code>AI_MODEL=claude-opus-4-8</code></pre>
+<pre data-prefix=""><code>#   → openai / gpt-...</code></pre>
+<pre data-prefix=""><code>#   → ollama / llama3  (homelab)</code></pre>
+      </div>
+      <div class="flex flex-col gap-3">
+        <div class="card card-border bg-base-200">
+          <div class="card-body p-4">
+            <h3 class="font-bold text-sm text-success">✅ Chosen: Vercel AI SDK abstraction</h3>
+            <p class="text-xs text-base-content/75 mt-1">Unified <code>generateObject()</code> with a Zod schema returns typed analysis from <b>any</b> provider. Portable <i>and</i> keeps each provider's native strengths. Adding a provider = one adapter package.</p>
+          </div>
+        </div>
+        <div class="card card-border bg-base-200">
+          <div class="card-body p-4">
+            <h3 class="font-bold text-sm text-base-content/70">Alt: pure OpenAI-compatible wire (LiteLLM)</h3>
+            <p class="text-xs text-base-content/75 mt-1">Code against the OpenAI SDK, point <code>baseURL</code> at a LiteLLM proxy that fronts every provider (incl. Ollama). Maximally standard, but lowest-common-denominator - you forfeit provider-native features. Good if you want the wire protocol itself to be the contract.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOPOLOGY -->
+  <section id="topology" class="mb-14 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-4 flex items-center gap-3"><span class="text-secondary">04</span> Deployment topology</h2>
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="font-semibold text-sm mb-3 text-base-content/70">docker-compose services on your homelab</h3>
+        <pre class="mermaid">
+flowchart TD
+  BROWSER["Browser + WXT extension"]
+  subgraph Compose["docker-compose (homelab)"]
+    WEB["web - Next.js"]
+    API["api - NestJS"]
+    WORKER["worker - NestJS"]
+    PG[("postgres")]
+    REDIS[("redis - BullMQ")]
+  end
+  GH[("GitHub - user repo")]
+  AI["Claude Opus 4.8<br/>or local Ollama"]
+
+  BROWSER -->|POST submission| API
+  BROWSER -->|"opens"| WEB
+  WEB -->|reads| API
+  API -->|commit| GH
+  API -->|upsert| PG
+  API -->|enqueue| REDIS
+  REDIS --> WORKER
+  WORKER -->|analyze| AI
+  WORKER -->|update| PG
+  WORKER -->|append notes| GH
+</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- DECISIONS -->
+  <section id="decisions" class="mb-12 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3"><span class="text-secondary">05</span> Choices — confirmed ✅</h2>
+    <p class="text-base-content/60 mb-5 text-sm max-w-2xl">Your picks are locked. One follow-up remains: which vendor-neutral AI approach.</p>
+
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="badge badge-lg badge-success badge-soft">Queue · BullMQ + Redis</span>
+      <span class="badge badge-lg badge-success badge-soft">Database · PostgreSQL</span>
+      <span class="badge badge-lg badge-success badge-soft">AI default · Claude Opus 4.8</span>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <form class="card card-border bg-base-200 border-warning/40" data-lavish-question="aiabstraction"
+        onsubmit="event.preventDefault(); const v=new FormData(event.currentTarget).get('aiabstraction'); if(v) window.lavish.queuePrompt('AI abstraction: '+v, {tag:'choice', text:'AI abstraction: '+v, element:event.currentTarget, queueKey:'aiabstraction'});">
+        <div class="card-body">
+          <h3 class="font-bold text-sm">⏳ How to stay vendor-neutral?</h3>
+          <label class="label cursor-pointer justify-start gap-2 text-xs"><input type="radio" name="aiabstraction" value="Vercel AI SDK abstraction" class="radio radio-xs radio-secondary"> Vercel AI SDK abstraction <span class="badge badge-xs">rec</span></label>
+          <label class="label cursor-pointer justify-start gap-2 text-xs"><input type="radio" name="aiabstraction" value="Pure OpenAI-compatible wire via LiteLLM proxy" class="radio radio-xs radio-secondary"> OpenAI-compatible wire (LiteLLM)</label>
+          <button class="btn btn-xs btn-secondary mt-2" type="submit">Queue &amp; send</button>
+        </div>
+      </form>
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="font-bold text-sm">🚀 Ready to scaffold?</h3>
+          <p class="text-xs text-base-content/75 mt-1">If the stack looks right, say the word and I'll scaffold the monorepo (pnpm + Turborepo, the 4 apps, shared packages, docker-compose) and stand up the MVP vertical slice.</p>
+          <button class="btn btn-sm btn-secondary mt-2" data-lavish-action onclick="window.lavish.queuePrompt('Stack approved - scaffold the monorepo', {tag:'choice', text:'Approved - scaffold the monorepo', queueKey:'scaffold'}); window.lavish.sendQueuedPrompts();">Approve &amp; scaffold ✅</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT NEXT -->
+  <section class="mb-8">
+    <h2 class="text-2xl font-bold mb-4 flex items-center gap-3"><span class="text-secondary">06</span> After sign-off</h2>
+    <ul class="steps steps-vertical lg:steps-horizontal w-full">
+      <li class="step step-secondary" data-content="1"><div class="text-left p-3"><h3 class="font-bold text-sm">Scaffold monorepo</h3><p class="text-xs text-base-content/70 mt-1">pnpm + Turborepo, the 4 apps + shared packages, docker-compose.</p></div></li>
+      <li class="step step-secondary" data-content="2"><div class="text-left p-3"><h3 class="font-bold text-sm">MVP vertical slice</h3><p class="text-xs text-base-content/70 mt-1">Extension captures LeetCode → API → GitHub + Postgres → list view.</p></div></li>
+      <li class="step" data-content="3"><div class="text-left p-3"><h3 class="font-bold text-sm">Enrichment + dashboard</h3><p class="text-xs text-base-content/70 mt-1">Wire the worker + Claude, then filters and insights.</p></div></li>
+    </ul>
+  </section>
+
+  <div class="divider"></div>
+  <p class="text-center text-xs text-base-content/50">ShekseCodeSync · Tech Stack v0.1 · Pick the three choices (or accept all), then we scaffold.</p>
+
+</main>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.esm.min.mjs";
+  const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const paint = document.createElement("canvas").getContext("2d");
+  function toRgba(color){paint.clearRect(0,0,1,1);paint.fillStyle="#000";paint.fillStyle=color;paint.fillRect(0,0,1,1);return paint.getImageData(0,0,1,1).data;}
+  function compositeRgba(f,b){const fa=f[3]/255,ba=b[3]/255,a=fa+ba*(1-fa);if(a===0)return[0,0,0,0];return[(f[0]*fa+b[0]*ba*(1-fa))/a,(f[1]*fa+b[1]*ba*(1-fa))/a,(f[2]*fa+b[2]*ba*(1-fa))/a,a*255];}
+  function pageIsDark(){const root=document.documentElement;const rb=toRgba(getComputedStyle(root).backgroundColor);const bb=document.body?toRgba(getComputedStyle(document.body).backgroundColor):[0,0,0,0];const[r,g,b,a]=compositeRgba(bb,rb);if(a>0)return(0.2126*r+0.7152*g+0.0722*b)/255<0.5;const cs=getComputedStyle(root).colorScheme;if(cs.includes("dark")&&!cs.includes("light"))return true;if(cs.includes("light")&&!cs.includes("dark"))return false;return darkQuery.matches;}
+  const diagrams=[...document.querySelectorAll(".mermaid")].map(el=>({el,src:el.textContent}));
+  let applied,rendering=false,queued=false;
+  function queueRender(){queued=true;if(rendering)return;void render();}
+  async function render(){rendering=true;try{while(queued){queued=false;const theme=pageIsDark()?"dark":"default";if(theme===applied)continue;mermaid.initialize({startOnLoad:false,theme,securityLevel:"strict"});for(const{el,src}of diagrams){el.removeAttribute("data-processed");el.textContent=src;}try{await mermaid.run({nodes:diagrams.map(d=>d.el)});}catch(e){console.error(e);return;}applied=theme;}}finally{rendering=false;if(queued)queueRender();}}
+  if(document.readyState==="complete")queueRender();else window.addEventListener("load",queueRender,{once:true});
+  const mo=new MutationObserver(queueRender);for(const el of[document.documentElement,document.body]){if(el)mo.observe(el,{attributes:true,attributeFilter:["data-theme","class","style"]});}
+  document.addEventListener("change",queueRender,true);
+  darkQuery.addEventListener("change",queueRender);
+</script>
+</body>
+</html>

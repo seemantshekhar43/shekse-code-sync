@@ -1,0 +1,551 @@
+<html data-theme="luxury" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShekseCodeSync — PRD</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, li, dd, td, th, .badge) { overflow-wrap: anywhere; }
+  :where(img, svg) { max-width: 100%; height: auto; }
+  html { scroll-behavior: smooth; }
+  .eyebrow { letter-spacing: .18em; text-transform: uppercase; font-size: .7rem; }
+  .mermaid { background: transparent; }
+  .pillar-num { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-base-100 text-base-content">
+
+<!-- NAV -->
+<div class="navbar bg-base-200/80 sticky top-0 z-30 backdrop-blur border-b border-base-content/10 px-4 lg:px-8">
+  <div class="navbar-start gap-2">
+    <span class="text-2xl">🧩</span>
+    <a class="font-bold text-lg tracking-tight">ShekseCodeSync</a>
+    <span class="badge badge-soft badge-primary badge-sm hidden sm:inline-flex">PRD v0.1</span>
+  </div>
+  <div class="navbar-end hidden lg:flex">
+    <ul class="menu menu-horizontal gap-1 text-sm">
+      <li><a href="#vision">Vision</a></li>
+      <li><a href="#pillars">Pillars</a></li>
+      <li><a href="#data">Data</a></li>
+      <li><a href="#arch">Architecture</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#decisions">Decisions</a></li>
+      <li><a href="#auth">Auth</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="mx-auto max-w-6xl px-4 lg:px-8 pb-24">
+
+  <!-- HERO -->
+  <section class="pt-12 pb-8">
+    <p class="eyebrow text-primary mb-3">Product Requirements Document</p>
+    <h1 class="text-4xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
+      Your DSA practice,<br>captured, understood, and<br>
+      <span class="text-primary">ready for revision.</span>
+    </h1>
+    <p class="mt-6 max-w-2xl text-lg text-base-content/70">
+      ShekseCodeSync automatically captures every problem you solve on LeetCode / NeetCode,
+      version-controls the question and solution in GitHub, enriches it with AI analysis,
+      and turns your history into a searchable dashboard and a smart revision engine.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-2">
+      <span class="badge badge-lg badge-outline">Browser plugin capture</span>
+      <span class="badge badge-lg badge-outline">GitHub as source of truth</span>
+      <span class="badge badge-lg badge-outline">Async AI (queued, non-blocking)</span>
+      <span class="badge badge-lg badge-outline">Multi-user</span>
+      <span class="badge badge-lg badge-outline">Self-hosted · Docker</span>
+    </div>
+  </section>
+
+  <!-- SNAPSHOT STATS -->
+  <section class="mb-12">
+    <div class="stats stats-vertical sm:stats-horizontal shadow w-full bg-base-200">
+      <div class="stat">
+        <div class="stat-title">Feature pillars</div>
+        <div class="stat-value text-primary">5</div>
+        <div class="stat-desc">Capture · Store · Analyze · Revise · Visualize</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Storage tiers</div>
+        <div class="stat-value">2</div>
+        <div class="stat-desc">GitHub (content) + DB (index)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Delivery phases</div>
+        <div class="stat-value">3</div>
+        <div class="stat-desc">MVP → Enrichment → Intelligence</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Open decisions</div>
+        <div class="stat-value text-success">0</div>
+        <div class="stat-desc">All locked — ready for stack</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISION / PROBLEM -->
+  <section id="vision" class="mb-16 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span class="text-primary">01</span> Vision &amp; Problem</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-error">The problem today</h3>
+          <ul class="mt-2 space-y-2 text-base-content/80 text-sm">
+            <li>• You solve hundreds of problems but they vanish into LeetCode's history — <b>no personal, portable record</b>.</li>
+            <li>• Solutions aren't version-controlled, so you can't diff, review, or show your growth.</li>
+            <li>• Metadata (patterns, topics, weaknesses) lives only in your head, so <b>revision is ad-hoc</b>.</li>
+            <li>• You re-solve problems blindly instead of targeting your actual weak spots.</li>
+            <li>• No single view of progress across platforms, topics, and difficulty.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-success">What ShekseCodeSync gives you</h3>
+          <ul class="mt-2 space-y-2 text-base-content/80 text-sm">
+            <li>• A <b>zero-effort capture</b> pipeline — solve, submit, it's saved.</li>
+            <li>• A GitHub repo that becomes your <b>public, browsable DSA portfolio</b>.</li>
+            <li>• An AI reviewer that grades complexity, names the pattern, and suggests optimizations.</li>
+            <li>• A revision engine that <b>builds the right quiz for your weaknesses</b>.</li>
+            <li>• A dashboard that answers "how am I actually doing?" at a glance.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-soft alert-info mt-4">
+      <span>🎯 <b>North-star:</b> Every problem you touch leaves a durable, enriched, revisitable trace — with effectively zero manual bookkeeping.</span>
+    </div>
+  </section>
+
+  <!-- PILLARS -->
+  <section id="pillars" class="mb-16 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3"><span class="text-primary">02</span> The Five Pillars</h2>
+    <p class="text-base-content/60 mb-6 text-sm max-w-2xl">Everything in the product maps to one of these. Data flows left to right: we <b>capture</b>, <b>store</b>, <b>analyze</b>, then <b>revise</b> and <b>visualize</b>.</p>
+    <div class="grid md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div class="card card-border bg-base-200 hover:border-primary transition-colors">
+        <div class="card-body p-5">
+          <div class="pillar-num text-3xl mb-1">🔌</div>
+          <h3 class="font-bold">1 · Capture</h3>
+          <p class="text-xs text-base-content/70 mt-1">Browser plugin auto-grabs each submission. Manual form as fallback.</p>
+        </div>
+      </div>
+      <div class="card card-border bg-base-200 hover:border-primary transition-colors">
+        <div class="card-body p-5">
+          <div class="pillar-num text-3xl mb-1">🗄️</div>
+          <h3 class="font-bold">2 · Store</h3>
+          <p class="text-xs text-base-content/70 mt-1">Question &amp; code in GitHub; metadata indexed in a DB.</p>
+        </div>
+      </div>
+      <div class="card card-border bg-base-200 hover:border-primary transition-colors">
+        <div class="card-body p-5">
+          <div class="pillar-num text-3xl mb-1">🤖</div>
+          <h3 class="font-bold">3 · Analyze</h3>
+          <p class="text-xs text-base-content/70 mt-1">AI grades complexity, tags topics, names patterns, suggests optimizations.</p>
+        </div>
+      </div>
+      <div class="card card-border bg-base-200 hover:border-primary transition-colors">
+        <div class="card-body p-5">
+          <div class="pillar-num text-3xl mb-1">🔁</div>
+          <h3 class="font-bold">4 · Revise</h3>
+          <p class="text-xs text-base-content/70 mt-1">Smart question banks &amp; quizzes by topic, level, pattern, weakness.</p>
+        </div>
+      </div>
+      <div class="card card-border bg-base-200 hover:border-primary transition-colors">
+        <div class="card-body p-5">
+          <div class="pillar-num text-3xl mb-1">📊</div>
+          <h3 class="font-bold">5 · Visualize</h3>
+          <p class="text-xs text-base-content/70 mt-1">Dashboard, filters, progress streaks &amp; insights.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA MODEL -->
+  <section id="data" class="mb-16 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3"><span class="text-primary">03</span> What we capture &amp; where it lives</h2>
+    <p class="text-base-content/60 mb-6 text-sm max-w-2xl">A key design decision: <b>two-tier storage</b>. GitHub holds the human-readable content (source of truth, diffable, shareable). The DB holds a queryable index that powers the dashboard and revision engine.</p>
+
+    <div class="grid lg:grid-cols-3 gap-4">
+      <!-- GitHub tier -->
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base"><span>📁</span> GitHub repo <span class="badge badge-sm badge-primary">content</span></h3>
+          <p class="text-xs text-base-content/60">One folder per question, named by title.</p>
+          <div class="mockup-code text-xs mt-2 bg-base-300">
+<pre data-prefix=""><code>two-sum/</code></pre>
+<pre data-prefix=""><code>  question.md</code></pre>
+<pre data-prefix=""><code>  solution.py</code></pre>
+<pre data-prefix=""><code>  solution.java</code></pre>
+<pre data-prefix=""><code>  meta.json</code></pre>
+          </div>
+          <ul class="text-xs text-base-content/70 mt-2 space-y-1">
+            <li>• <code>question.md</code> — full statement</li>
+            <li>• <code>solution.&lt;ext&gt;</code> — code per language</li>
+            <li>• <code>meta.json</code> — mirror of metadata (portability)</li>
+          </ul>
+        </div>
+      </div>
+      <!-- DB tier -->
+      <div class="card card-border bg-base-200 lg:col-span-2">
+        <div class="card-body">
+          <h3 class="card-title text-base"><span>🗄️</span> Database <span class="badge badge-sm badge-secondary">index</span></h3>
+          <p class="text-xs text-base-content/60 mb-2">Powers dashboard filtering, insights, and revision selection. Points back to GitHub paths.</p>
+          <div class="overflow-x-auto rounded-box border border-base-content/10">
+            <table class="table table-xs table-zebra">
+              <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td>title</td><td>string</td><td class="text-primary">capture</td><td>folder key</td></tr>
+                <tr><td>questionLink</td><td>url</td><td class="text-primary">capture</td><td>canonical problem URL</td></tr>
+                <tr><td>platform</td><td>enum</td><td class="text-primary">capture</td><td>leetcode / neetcode / manual</td></tr>
+                <tr><td>level</td><td>enum</td><td class="text-primary">capture</td><td>easy / medium / hard</td></tr>
+                <tr><td>tags · topics</td><td>string[]</td><td class="text-primary">capture</td><td>+ AI-enriched</td></tr>
+                <tr><td>companies</td><td>string[]</td><td class="text-primary">capture</td><td>if available</td></tr>
+                <tr><td>language</td><td>enum</td><td class="text-primary">capture</td><td>drives file ext</td></tr>
+                <tr><td>runtime · memory</td><td>metric</td><td class="text-primary">capture</td><td>submission stats</td></tr>
+                <tr><td>status</td><td>enum</td><td class="text-primary">capture</td><td>accepted / wrong / TLE</td></tr>
+                <tr><td>isMarkedForRevision</td><td>bool</td><td class="text-info">user</td><td>revision flag</td></tr>
+                <tr><td>timeComplexity · spaceComplexity</td><td>string</td><td class="text-accent">AI</td><td>Big-O</td></tr>
+                <tr><td>pattern</td><td>string</td><td class="text-accent">AI</td><td>e.g. sliding-window</td></tr>
+                <tr><td>optimizationNotes</td><td>text</td><td class="text-accent">AI</td><td>scope to improve</td></tr>
+                <tr><td>solvedAt</td><td>datetime</td><td class="text-primary">capture</td><td>drives streaks</td></tr>
+                <tr><td>attemptCount</td><td>int</td><td class="text-primary">capture</td><td>tracks struggle</td></tr>
+                <tr><td>repoPath</td><td>string</td><td>system</td><td>link to GitHub folder</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="flex flex-wrap gap-3 mt-2 text-xs">
+            <span class="flex items-center gap-1"><span class="badge badge-xs badge-primary"></span> from capture</span>
+            <span class="flex items-center gap-1"><span class="badge badge-xs badge-info"></span> user-set</span>
+            <span class="flex items-center gap-1"><span class="badge badge-xs badge-accent"></span> AI-derived</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section id="arch" class="mb-16 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3"><span class="text-primary">04</span> How it fits together</h2>
+    <p class="text-base-content/60 mb-6 text-sm max-w-2xl">High-level component map. Tech choices come after this PRD is signed off — boxes are roles, not products.</p>
+
+    <div class="card card-border bg-base-200 mb-4">
+      <div class="card-body">
+        <h3 class="font-semibold text-sm mb-3 text-base-content/70">System topology</h3>
+        <pre class="mermaid">
+flowchart TD
+  subgraph Sources
+    LC["LeetCode / NeetCode<br/>submission"]
+    FORM["Manual entry form"]
+  end
+  PLUGIN["Browser Plugin<br/>(capture on submit)"]
+  API["Backend API"]
+  QUEUE["Job Queue"]
+  WORKER["AI Worker<br/>(background)"]
+  DB[("Metadata DB")]
+  GH[("GitHub Repo<br/>question.md + solution.ext")]
+  WEB["Web Dashboard<br/>+ Revision + Quiz"]
+
+  LC --> PLUGIN
+  PLUGIN --> API
+  FORM --> API
+  API -->|1 commit| GH
+  API -->|2 upsert| DB
+  API -->|3 enqueue| QUEUE
+  API -.->|returns 200 now| PLUGIN
+  QUEUE --> WORKER
+  WORKER --> DB
+  WORKER --> GH
+  DB --> WEB
+  GH --> WEB
+  WEB -->|mark for revision| API
+</pre>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="font-semibold text-sm mb-3 text-base-content/70">Capture flow (on submit) — save is synchronous, AI is fire-and-forget</h3>
+        <pre class="mermaid">
+sequenceDiagram
+  participant U as You
+  participant P as Plugin
+  participant A as Backend API
+  participant G as GitHub
+  participant D as DB
+  participant Q as Job Queue
+  participant W as AI Worker
+  U->>P: Submit accepted solution
+  P->>P: Scrape title, code, tags, level, link, stats
+  P->>A: POST submission payload
+  A->>G: Commit question.md + solution.ext
+  A->>D: Upsert metadata row
+  A->>Q: Enqueue AI-enrichment job
+  A-->>P: 200 OK (saved) — does NOT wait for AI
+  Note over Q,W: happens later, in background
+  W->>Q: Pick up job
+  W->>W: Analyze complexity, pattern, optimization
+  W->>D: Update row with AI fields
+  W->>G: Append AI notes to meta.json
+</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE DEEP DIVES -->
+  <section class="mb-16 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span class="text-primary">05</span> Feature deep-dives</h2>
+
+    <div class="space-y-3">
+      <!-- Capture -->
+      <div tabindex="0" class="collapse collapse-arrow bg-base-200 border border-base-content/10">
+        <div class="collapse-title font-semibold flex items-center gap-2">🔌 Capture — the plugin</div>
+        <div class="collapse-content text-sm text-base-content/80">
+          <ul class="space-y-2">
+            <li>• <b>Auto mode:</b> browser extension detects an accepted submission on LeetCode/NeetCode and scrapes title, statement, code, language, difficulty, tags/topics, companies, link, and runtime/memory stats.</li>
+            <li>• <b>Pull button:</b> a popup window with a "Pull &amp; Send" action for when you want to capture on demand (or re-capture).</li>
+            <li>• <b>Manual fallback:</b> a web form (see Manual entry) for problems solved elsewhere or offline.</li>
+            <li>• <b>De-dupe:</b> re-submitting the same problem updates the record and adds a new solution revision rather than creating duplicates.</li>
+          </ul>
+          <div class="alert alert-soft alert-warning mt-3 text-xs"><span>⚠️ Feasibility note: LeetCode exposes much of this via its GraphQL API; <b>companies</b> are often premium-gated. We'll confirm what's reliably scrapable during tech design.</span></div>
+        </div>
+      </div>
+
+      <!-- AI -->
+      <div tabindex="0" class="collapse collapse-arrow bg-base-200 border border-base-content/10">
+        <div class="collapse-title font-semibold flex items-center gap-2">🤖 AI analysis</div>
+        <div class="collapse-content text-sm text-base-content/80">
+          <ul class="space-y-2">
+            <li>• <b>Complexity review:</b> grades your solution's actual time &amp; space complexity with a short justification.</li>
+            <li>• <b>Auto-metadata:</b> infers/normalizes tags, topics, and difficulty (useful for manual entries and cross-checking platform data).</li>
+            <li>• <b>Optimization scan:</b> flags whether a better approach exists and sketches it (without spoiling — configurable).</li>
+            <li>• <b>Pattern attribution:</b> names the underlying pattern (two-pointers, sliding window, BFS/DFS, DP, monotonic stack, union-find…) — this becomes a first-class revision dimension.</li>
+          </ul>
+          <div class="alert alert-soft alert-info mt-3 text-xs"><span>💡 <b>Fire-and-forget:</b> the API returns <code>200</code> as soon as GitHub + DB writes succeed, then enqueues the AI job. A background worker enriches the record later and the dashboard fills in AI fields when ready — the capture path never waits on the model. Re-runnable on demand from the dashboard. Failed jobs retry; the row simply stays "pending enrichment" until they succeed.</span></div>
+        </div>
+      </div>
+
+      <!-- Revision -->
+      <div tabindex="0" class="collapse collapse-arrow bg-base-200 border border-base-content/10">
+        <div class="collapse-title font-semibold flex items-center gap-2">🔁 Revision engine</div>
+        <div class="collapse-content text-sm text-base-content/80">
+          <ul class="space-y-2">
+            <li>• <b>Question banks</b> assembled from your history: by <code>isMarkedForRevision</code>, by loophole/weakness, topic-wise, level-wise, or a mixed set.</li>
+            <li>• <b>Quiz mode:</b> generate a timed set; hide the solution, reveal after attempt, self-rate.</li>
+            <li>• <b>Weakness targeting:</b> problems with high <code>attemptCount</code>, wrong-first-submit, or low self-rating surface more often.</li>
+            <li>• <b>Suggested (v2):</b> spaced-repetition (Anki-style) scheduling so revision timing is automatic, not manual.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Dashboard -->
+      <div tabindex="0" class="collapse collapse-arrow bg-base-200 border border-base-content/10">
+        <div class="collapse-title font-semibold flex items-center gap-2">📊 Dashboard &amp; insights</div>
+        <div class="collapse-content text-sm text-base-content/80">
+          <ul class="space-y-2">
+            <li>• Browse/filter all solved problems by topic, tag, date, level, pattern, platform, revision flag.</li>
+            <li>• <b>Progress header:</b> problems solved today / this week / this month, current streak, difficulty split.</li>
+            <li>• <b>Insight cards:</b> strongest &amp; weakest topics, pattern coverage, hardest-fought problems, consistency heatmap.</li>
+            <li>• Click any problem → question + solution (rendered from GitHub) + AI notes + revision controls.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Manual entry -->
+      <div tabindex="0" class="collapse collapse-arrow bg-base-200 border border-base-content/10">
+        <div class="collapse-title font-semibold flex items-center gap-2">✍️ Manual entry</div>
+        <div class="collapse-content text-sm text-base-content/80">
+          <ul class="space-y-2">
+            <li>• Form accepts title + all metadata fields.</li>
+            <li>• Markdown editor (with preview) for the question statement.</li>
+            <li>• Language selector + code editor for the solution.</li>
+            <li>• Same downstream pipeline: writes to GitHub + DB, triggers AI enrichment.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap" class="mb-16 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span class="text-primary">06</span> Phased roadmap</h2>
+    <ul class="steps steps-vertical lg:steps-horizontal w-full">
+      <li class="step step-primary" data-content="1">
+        <div class="text-left p-3">
+          <h3 class="font-bold">MVP — Capture &amp; Store</h3>
+          <p class="text-xs text-base-content/70 mt-1">Plugin captures LeetCode submissions → GitHub + DB. Basic list dashboard. Manual form.</p>
+        </div>
+      </li>
+      <li class="step step-primary" data-content="2">
+        <div class="text-left p-3">
+          <h3 class="font-bold">v1 — Enrichment &amp; Insights</h3>
+          <p class="text-xs text-base-content/70 mt-1">AI complexity/pattern/optimization. Filterable dashboard, progress header, insight cards.</p>
+        </div>
+      </li>
+      <li class="step" data-content="3">
+        <div class="text-left p-3">
+          <h3 class="font-bold">v2 — Intelligence &amp; Revision</h3>
+          <p class="text-xs text-base-content/70 mt-1">Revision banks, quiz mode, spaced repetition, weakness targeting, NeetCode + more platforms.</p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- DECISIONS -->
+  <section id="decisions" class="mb-12 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3"><span class="text-primary">07</span> Decisions — locked ✅</h2>
+    <p class="text-base-content/60 mb-6 text-sm max-w-2xl">Your answers are captured below. One decision (spaced repetition) is still open — pick it and queue when ready.</p>
+
+    <div class="overflow-x-auto rounded-box border border-base-content/10 mb-6">
+      <table class="table table-zebra">
+        <thead><tr><th>Decision</th><th>Your call</th><th>Impact</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Audience</td>
+            <td><span class="badge badge-success badge-soft">Multi-user product</span></td>
+            <td class="text-xs text-base-content/70">Accounts, auth, per-user repos &amp; data isolation from day one.</td>
+          </tr>
+          <tr>
+            <td>Source of truth</td>
+            <td><span class="badge badge-success badge-soft">GitHub SoT + DB index</span></td>
+            <td class="text-xs text-base-content/70">Content lives in Git; DB is a rebuildable index. Reconcile job keeps them in sync.</td>
+          </tr>
+          <tr>
+            <td>Platforms (launch)</td>
+            <td><span class="badge badge-success badge-soft">LeetCode + NeetCode</span></td>
+            <td class="text-xs text-base-content/70">Two capture adapters up front; plugin architecture must be platform-pluggable.</td>
+          </tr>
+          <tr>
+            <td>AI timing</td>
+            <td><span class="badge badge-success badge-soft">Auto on capture (queued, fire-and-forget)</span></td>
+            <td class="text-xs text-base-content/70">API returns 200 after GitHub+DB; a job queue + worker enrich later. Needs a queue in the stack.</td>
+          </tr>
+          <tr>
+            <td>Deployment</td>
+            <td><span class="badge badge-success badge-soft">Self-hosted — Docker on homelab</span></td>
+            <td class="text-xs text-base-content/70">Ship as container image(s) + docker-compose. Keep deps self-containable (no mandatory cloud services).</td>
+          </tr>
+          <tr>
+            <td>Spaced repetition</td>
+            <td><span class="badge badge-success badge-soft">Yes — Anki-style scheduling (v2)</span></td>
+            <td class="text-xs text-base-content/70">Each revision attempt is self-rated; an SRS scheduler picks the next due date. Lands in v2.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="font-bold text-sm">🧭 What these choices imply for the build</h3>
+        <ul class="text-xs text-base-content/70 space-y-1 mt-1 md:columns-2">
+          <li>• <b>Auth:</b> user accounts; each user connects their own GitHub repo (see §08 below).</li>
+          <li>• <b>Isolation:</b> DB rows scoped by <code>userId</code>; one worker pool serves all users' AI jobs.</li>
+          <li>• <b>Self-hostable AI:</b> pluggable provider — hosted API key <i>or</i> a local model on the homelab.</li>
+          <li>• <b>One compose file:</b> web + API + worker + DB + queue, all containerized.</li>
+          <li>• <b>Queue required:</b> the async AI decision means a real job queue is part of the stack.</li>
+          <li>• <b>SRS schema:</b> revision attempts need their own table (ease, interval, due date).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTH -->
+  <section id="auth" class="mb-16 scroll-mt-20">
+    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3"><span class="text-primary">08</span> Auth &amp; the GitHub connection</h2>
+    <p class="text-base-content/60 mb-6 text-sm max-w-2xl">Your question: <i>"how does the plugin authenticate with GitHub — does it create an app and authorize from GitHub?"</i> Here's the design.</p>
+
+    <div class="alert alert-soft alert-success mb-4 text-sm">
+      <span>🔑 <b>Core principle:</b> the browser plugin <u>never</u> holds GitHub credentials and never talks to GitHub directly. It only talks to <i>our</i> backend. The backend owns the GitHub connection via a <b>GitHub App</b>.</span>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-4 mb-4">
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">Why a GitHub App (not PAT / OAuth)?</h3>
+          <div class="overflow-x-auto rounded-box border border-base-content/10 mt-1">
+            <table class="table table-xs">
+              <thead><tr><th>Approach</th><th>Verdict</th></tr></thead>
+              <tbody>
+                <tr><td><b>GitHub App</b> <span class="badge badge-xs badge-success">chosen</span></td><td class="text-xs">Fine-grained, per-repo install, short-lived tokens, revocable, higher rate limits. Best security + UX.</td></tr>
+                <tr><td>OAuth App</td><td class="text-xs">User token with broad <code>repo</code> scope — more access than needed, no per-repo scoping.</td></tr>
+                <tr><td>Personal Access Token</td><td class="text-xs">User pastes a token manually — works, but manual, long-lived, easy to leak. Offer only as a fallback.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card card-border bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-base">Two separate auth boundaries</h3>
+          <ul class="text-sm text-base-content/80 space-y-2 mt-1">
+            <li>① <b>Plugin ↔ our backend:</b> the plugin holds a <b>ShekseCodeSync token</b> (issued when you sign in / paste from the dashboard). This is <i>not</i> a GitHub token.</li>
+            <li>② <b>Our backend ↔ GitHub:</b> handled once during web onboarding by <b>installing our GitHub App</b> on the repo you choose. Backend stores the installation ID and mints short-lived installation tokens per commit.</li>
+          </ul>
+          <p class="text-xs text-base-content/60 mt-2">So the GitHub "authorize" screen appears <b>in the web dashboard during setup</b>, not in the plugin, and not on every submission.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="font-semibold text-sm mb-3 text-base-content/70">One-time connect flow, then every-submission flow</h3>
+        <pre class="mermaid">
+flowchart TD
+  subgraph Onboard["One-time setup (web dashboard)"]
+    A1["User signs into ShekseCodeSync"] --> A2["Clicks Connect GitHub"]
+    A2 --> A3["GitHub: Install App on chosen repo + Authorize"]
+    A3 --> A4["Backend stores installationId (encrypted)"]
+    A5["User installs plugin, signs in once"] --> A6["Plugin stores ShekseCodeSync token"]
+  end
+  subgraph Run["Every submission"]
+    B1["Plugin POSTs submission + SCS token"] --> B2["Backend verifies token, finds user"]
+    B2 --> B3["Backend mints short-lived GitHub App token"]
+    B3 --> B4["Commit to user's repo"]
+  end
+  A4 -.-> B3
+  A6 -.-> B1
+</pre>
+        <div class="alert alert-soft alert-warning mt-3 text-xs"><span>⚠️ <b>Self-hosting note:</b> because you run this on your homelab, whoever deploys registers <i>one</i> GitHub App (a 2-minute step) and drops its App ID + private key into config. All users of that instance then install it on their repos. Documented in setup.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RISKS -->
+  <section class="mb-8">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span class="text-primary">09</span> Risks &amp; open questions</h2>
+    <div class="grid md:grid-cols-2 gap-3">
+      <div class="alert alert-soft alert-warning text-sm"><span>⚠️ <b>LeetCode scraping fragility:</b> DOM/API changes can break capture; companies data is premium-gated. Need a resilient capture strategy + graceful degradation.</span></div>
+      <div class="alert alert-soft alert-warning text-sm"><span>⚠️ <b>GitHub write path:</b> GitHub App resolves auth (§08), but still need rate-limit handling + batching; large histories mean many commits.</span></div>
+      <div class="alert alert-soft alert-warning text-sm"><span>⚠️ <b>AI accuracy &amp; cost:</b> complexity/pattern calls cost tokens and can be wrong — need review/override + caching.</span></div>
+      <div class="alert alert-soft alert-warning text-sm"><span>⚠️ <b>Two-tier consistency:</b> GitHub and DB can drift; need a reconcile/sync strategy and idempotent writes.</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+  <p class="text-center text-xs text-base-content/50">ShekseCodeSync · PRD v0.1 · Annotate any section, then queue your decisions above. Tech stack comes next.</p>
+
+</main>
+
+<!-- Mermaid theme-aware render -->
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.esm.min.mjs";
+  const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const paint = document.createElement("canvas").getContext("2d");
+  function toRgba(color){paint.clearRect(0,0,1,1);paint.fillStyle="#000";paint.fillStyle=color;paint.fillRect(0,0,1,1);return paint.getImageData(0,0,1,1).data;}
+  function compositeRgba(f,b){const fa=f[3]/255,ba=b[3]/255,a=fa+ba*(1-fa);if(a===0)return[0,0,0,0];return[(f[0]*fa+b[0]*ba*(1-fa))/a,(f[1]*fa+b[1]*ba*(1-fa))/a,(f[2]*fa+b[2]*ba*(1-fa))/a,a*255];}
+  function pageIsDark(){const root=document.documentElement;const rb=toRgba(getComputedStyle(root).backgroundColor);const bb=document.body?toRgba(getComputedStyle(document.body).backgroundColor):[0,0,0,0];const[r,g,b,a]=compositeRgba(bb,rb);if(a>0)return(0.2126*r+0.7152*g+0.0722*b)/255<0.5;const cs=getComputedStyle(root).colorScheme;if(cs.includes("dark")&&!cs.includes("light"))return true;if(cs.includes("light")&&!cs.includes("dark"))return false;return darkQuery.matches;}
+  const diagrams=[...document.querySelectorAll(".mermaid")].map(el=>({el,src:el.textContent}));
+  let applied,rendering=false,queued=false;
+  function queueRender(){queued=true;if(rendering)return;void render();}
+  async function render(){rendering=true;try{while(queued){queued=false;const theme=pageIsDark()?"dark":"default";if(theme===applied)continue;mermaid.initialize({startOnLoad:false,theme,securityLevel:"strict"});for(const{el,src}of diagrams){el.removeAttribute("data-processed");el.textContent=src;}try{await mermaid.run({nodes:diagrams.map(d=>d.el)});}catch(e){console.error(e);return;}applied=theme;}}finally{rendering=false;if(queued)queueRender();}}
+  if(document.readyState==="complete")queueRender();else window.addEventListener("load",queueRender,{once:true});
+  const mo=new MutationObserver(queueRender);for(const el of[document.documentElement,document.body]){if(el)mo.observe(el,{attributes:true,attributeFilter:["data-theme","class","style"]});}
+  document.addEventListener("change",queueRender,true);
+  darkQuery.addEventListener("change",queueRender);
+</script>
+</body>
+</html>
