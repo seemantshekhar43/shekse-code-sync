@@ -1,0 +1,26 @@
+{
+  "name": "shekse-code-sync",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.17.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:watch": "turbo run test -- --watch",
+    "e2e": "turbo run e2e",
+    "db:migrate": "pnpm --filter @scs/db migrate",
+    "db:generate": "pnpm --filter @scs/db generate",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.3",
+    "typescript": "^5.6.2"
+  }
+}
