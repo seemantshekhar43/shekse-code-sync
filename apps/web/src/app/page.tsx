@@ -18,6 +18,15 @@ const levelColor: Record<string, string> = {
   hard: "text-red-600",
 };
 
+function safeHttpUrl(link: string): string | null {
+  try {
+    const url = new URL(link);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function HomePage() {
   const submissions = await getSubmissions();
 
@@ -45,9 +54,16 @@ export default async function HomePage() {
             {submissions.map((s) => (
               <tr key={s.id} className="border-b">
                 <td className="py-2 font-medium">
-                  <a href={s.questionLink} className="hover:underline" target="_blank" rel="noreferrer">
-                    {s.title}
-                  </a>
+                  {(() => {
+                    const href = safeHttpUrl(s.questionLink);
+                    return href ? (
+                      <a href={href} className="hover:underline" target="_blank" rel="noreferrer">
+                        {s.title}
+                      </a>
+                    ) : (
+                      <span>{s.title}</span>
+                    );
+                  })()}
                 </td>
                 <td className="py-2 text-gray-600">{s.platform}</td>
                 <td className={`py-2 font-medium ${levelColor[s.level] ?? ""}`}>{s.level}</td>
