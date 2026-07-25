@@ -24,8 +24,30 @@ Work is tracked as **GitHub issues**. For each unit of work:
    Closes #6"
    ```
    Use `Closes #N` / `Fixes #N` so the commit both does the work and closes the task. On a branch, put `Closes #N` in the commit or the PR body; the issue closes when the PR merges to `main`.
-4. **Keep the decision log current.** When a significant decision is made, append it to `docs/DECISIONS.md`.
-5. Don't push or perform outward-facing actions without the work being complete and, where it's a new external action, confirmed.
+4. **Validate non-trivial feature work through the no-mistakes gate** (see the section below) before it reaches `origin`, instead of a bare `git push` + manual PR.
+5. **Keep the decision log current.** When a significant decision is made, append it to `docs/DECISIONS.md`.
+6. Don't push or perform outward-facing actions without the work being complete and, where it's a new external action, confirmed.
+
+## Validating changes with no-mistakes
+
+For non-trivial feature work, run it through the local **no-mistakes** gate before it reaches `origin`. The gate runs a pipeline over the committed feature branch - AI code review, tests, docs, lint, push, PR, and CI monitoring - so it replaces the manual `git push` + `gh-axi pr create` tail for feature branches. Small repo-hygiene or docs changes on `main` don't need it.
+
+Prerequisite: the repo is already initialized (`no-mistakes init`, one-time). Work must be committed on a **feature branch** (not `main`).
+
+Flow:
+1. Do the work; commit on a feature branch with `Closes #N` in the commit message (so the issue closes when the PR merges).
+2. Validate - pass a rich `--intent` (the user's goal plus the key decisions/tradeoffs you made, not a diff summary; the review step relies on it):
+   ```bash
+   no-mistakes axi run --intent "<what the user set out to accomplish + decisions>"
+   ```
+   The call blocks through each step (review/test/CI can take minutes each). Don't cancel or re-issue it; check progress with `no-mistakes axi status` from a separate call.
+3. At each `gate:`, read the findings and respond - never edit files to fix findings mid-run, the pipeline owns the fixes:
+   - `auto-fix` finding → `no-mistakes axi respond --action fix --findings <ids>`
+   - accept the step → `--action approve`; skip it → `--action skip`
+4. **Escalate `ask-user` findings to the user verbatim** (id, file, full description). Those challenge intent or product behavior - don't decide them yourself.
+5. On `checks-passed`, the PR is green and ready: tell the user to review + merge (link in the output); don't wait on the merge. On `failed`/`cancelled`, fix on the same branch and re-run.
+
+Only run the gate when the user asks to ship/validate/gate a change, or per this project's feature-work convention above - not as a reflex on every trivial edit.
 
 ## Planning & big decisions — use lavish
 
