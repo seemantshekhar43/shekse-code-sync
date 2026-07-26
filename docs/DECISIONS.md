@@ -60,3 +60,13 @@ Replaced the `DEMO_GITHUB_*` env bridge with a real per-user install flow: each 
 |---|---|---|---|
 | 27 | Repo resolution | Auto from the installation: the `/github/installed` redirect resolves accessible repos via a short-lived installation token - persist automatically when exactly one, else hand off to a picker page | Manual owner/repo entry field - avoided mismatches with what the App is actually installed on |
 | 28 | Install callback gate | The callback requires an Auth.js session and verifies the installation's account is a `User` whose login matches the signed-in user (orgs rejected until admin verification ships); an optional signed `state` nonce binds our own install link to the user | Trusting the callback's `installation_id` directly - left a cross-account installation-hijacking hole |
+
+## 2026-07-27 - Web dashboard rebuild in the locked design (issue #27)
+
+Implemented the axi.md design tokens from `docs/DESIGN.md` and the signed-off `docs/design/ui-direction.html` mockup in `apps/web`.
+
+| # | Decision | Choice | Alternative considered |
+|---|---|---|---|
+| 29 | Token delivery | Palette/typography/radius/shadow encoded as CSS variables (`globals.css`) plus `tailwind.config.ts` theme extensions | Hardcoding the mockup's utility classes - would drift from the locked tokens and block reuse in the plugin popup |
+| 30 | Dashboard data | Stats row and revision queue derived from real `SubmissionSummary` fields (`isMarkedForRevision`, `pattern`, `solvedAt`); the AI Insight card states insights land once the SRS revision engine (issue #31) ships | Fabricating placeholder numbers to match the mockup - would misrepresent product state |
+| 31 | Non-mockup sections | Existing GitHub-connect banner and extension-token sections (not in the mockup) kept and restyled with the same tokens below the redesigned shell | Dropping them to match the mockup exactly - both are still-needed, shipped features |

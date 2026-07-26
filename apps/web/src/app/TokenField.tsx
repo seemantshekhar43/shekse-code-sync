@@ -22,12 +22,12 @@ export function TokenField({ token }: { token: string }) {
         readOnly
         value={token}
         onFocus={(e) => e.currentTarget.select()}
-        className="flex-1 rounded border border-gray-200 bg-gray-50 px-2 py-1 font-mono text-xs"
+        className="flex-1 rounded-card border border-border bg-surface px-2 py-1.5 font-mono text-xs text-ink"
       />
       <button
         type="button"
         onClick={copy}
-        className="rounded bg-gray-900 px-3 py-1 text-xs font-medium text-white"
+        className="rounded-btn bg-green px-3 py-1.5 text-xs font-semibold text-white"
       >
         {copied ? "Copied" : "Copy"}
       </button>
