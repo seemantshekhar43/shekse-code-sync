@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShekseCodeSync — UI Design Direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F2ED;
+    --surface:#ECEAE4;
+    --surface-2:#E2DED7;
+    --border:#D1CCC4;
+    --ink:#1A1A1A;
+    --muted:#6B6560;
+    --faint:#908A82;
+    --green:#1A6B5A;
+    --green-soft:rgba(26,107,90,.10);
+    --easy:#1A6B5A;
+    --medium:#B4791F;
+    --hard:#B03A2E;
+    --serif:"Source Serif 4",Georgia,serif;
+    --sans:"Inter",-apple-system,system-ui,sans-serif;
+    --mono:"JetBrains Mono","Fira Code",monospace;
+    --r:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1120px;margin:0 auto;padding:64px 32px 96px;}
+  .eyebrow{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  h1.display{font-family:var(--serif);font-weight:600;font-size:46px;line-height:1.08;letter-spacing:-.01em;margin:14px 0 10px;}
+  h1.display .br{color:var(--green);}
+  .lede{font-size:17px;color:var(--muted);max-width:640px;margin:0;}
+  h2.sec{font-family:var(--serif);font-weight:600;font-size:30px;margin:0 0 4px;}
+  h2.sec .br{color:var(--green);}
+  .sec-sub{color:var(--muted);margin:0 0 26px;max-width:680px;}
+  .rule{height:1px;background:var(--border);border:0;margin:60px 0;}
+  section{margin-top:8px;}
+
+  /* Tokens */
+  .tok-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;}
+  .card h3{font-family:var(--sans);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 16px;}
+  .swatches{display:flex;flex-wrap:wrap;gap:12px;}
+  .sw{width:88px;}
+  .sw .chip{height:52px;border-radius:8px;border:1px solid rgba(0,0,0,.08);}
+  .sw .name{font-size:12px;margin-top:7px;font-weight:500;}
+  .sw .hex{font-family:var(--mono);font-size:11px;color:var(--muted);}
+  .type-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .type-row:last-child{border-bottom:0;}
+  .type-row .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:600;white-space:nowrap;}
+  .samp-serif{font-family:var(--serif);}
+  .samp-sans{font-family:var(--sans);}
+  .samp-mono{font-family:var(--mono);}
+
+  /* Surface mockups layout */
+  .surfaces{display:grid;grid-template-columns:380px 1fr;gap:34px;align-items:start;}
+  .surface-label{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 14px;}
+
+  /* --- Plugin popup --- */
+  .popup{width:360px;background:var(--paper);border:1px solid var(--border);border-radius:14px;
+    box-shadow:0 18px 44px -18px rgba(40,34,28,.34);overflow:hidden;}
+  .popup .top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+  .brand{display:flex;align-items:center;gap:8px;font-family:var(--serif);font-weight:600;font-size:15px;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft);}
+  .status{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);font-weight:500;}
+  .status .led{width:6px;height:6px;border-radius:50%;background:var(--green);}
+  .popup .body{padding:16px;}
+  .detect{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:10px;}
+  .prob{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;}
+  .prob .ptitle{font-family:var(--serif);font-size:17px;font-weight:600;line-height:1.2;margin-bottom:9px;}
+  .badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+  .badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.02em;}
+  .badge.easy{color:#fff;background:var(--easy);}
+  .badge.pattern{color:var(--green);background:var(--green-soft);}
+  .badge.lang{color:var(--muted);background:var(--surface-2);border:1px solid var(--border);}
+  .metrics{display:flex;gap:18px;padding-top:11px;border-top:1px solid var(--border);}
+  .metric .mv{font-family:var(--mono);font-size:14px;font-weight:600;}
+  .metric .ml{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600;}
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;
+    background:var(--green);color:#fff;border:0;border-radius:9px;padding:12px;font-family:var(--sans);
+    font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.01em;}
+  .btn .arw{opacity:.85;}
+  .recent{margin-top:18px;}
+  .recent .rh{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:8px;}
+  .ritem{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+  .ritem:last-child{border-bottom:0;}
+  .ritem .rn{font-size:13px;font-weight:500;}
+  .ritem .rn small{display:block;color:var(--faint);font-size:11px;font-weight:400;font-family:var(--mono);}
+  .ritem .rs{font-size:11px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:5px;}
+  .ritem .rs .c{width:5px;height:5px;border-radius:50%;background:var(--green);}
+  .popup .foot{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-top:1px solid var(--border);background:var(--surface);}
+  .popup .foot a{color:var(--muted);font-size:12px;text-decoration:none;font-weight:500;}
+  .popup .foot a:hover{color:var(--green);}
+
+  /* --- Dashboard --- */
+  .dash{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--paper);box-shadow:0 18px 44px -22px rgba(40,34,28,.28);}
+  .dnav{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);}
+  .dnav .left{display:flex;align-items:center;gap:26px;}
+  .dnav .nav-brand{display:flex;align-items:center;gap:8px;font-family:var(--serif);font-weight:600;font-size:16px;}
+  .dnav .nav-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft);}
+  .dnav nav{display:flex;gap:20px;}
+  .dnav nav a{font-size:13px;color:var(--muted);text-decoration:none;font-weight:500;}
+  .dnav nav a.active{color:var(--ink);}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;}
+  .dhero{padding:30px 24px 6px;}
+  .dhero .eyebrow{margin-bottom:8px;}
+  .dhero h2{font-family:var(--serif);font-weight:600;font-size:28px;margin:0 0 22px;}
+  .dhero h2 .br{color:var(--green);}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+  .stat .sv{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1;}
+  .stat .sl{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:7px;}
+  .stat .sd{font-size:11.5px;color:var(--faint);margin-top:3px;}
+  .dgrid{display:grid;grid-template-columns:1fr 300px;gap:22px;padding:26px 24px 28px;}
+  .panel-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .panel-h h3{font-family:var(--serif);font-size:18px;font-weight:600;margin:0;}
+  .panel-h a{font-size:12px;color:var(--green);text-decoration:none;font-weight:600;}
+  table{width:100%;border-collapse:collapse;}
+  thead th{text-align:left;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600;padding:0 16px 10px 0;border-bottom:1px solid var(--border);white-space:nowrap;}
+  tbody td{padding:12px 16px 12px 0;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:middle;}
+  thead th:last-child,tbody td:last-child{padding-right:0;}
+  tbody tr:last-child td{border-bottom:0;}
+  td .tt{font-weight:600;}
+  td .num{font-family:var(--mono);color:var(--faint);font-size:12px;}
+  .pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;}
+  .pill.easy{color:var(--easy);background:var(--green-soft);}
+  .pill.medium{color:var(--medium);background:rgba(180,121,31,.12);}
+  .pill.hard{color:var(--hard);background:rgba(176,58,46,.12);}
+  .patt{font-size:12px;color:var(--muted);}
+  .synced{font-size:11.5px;color:var(--green);font-weight:600;display:inline-flex;align-items:center;gap:5px;}
+  .synced .c{width:5px;height:5px;border-radius:50%;background:var(--green);}
+  .queued{color:var(--medium);}
+  .queued .c{background:var(--medium);}
+  .side .revcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px 16px;margin-bottom:12px;}
+  .side .revcard:last-child{margin-bottom:0;}
+  .revcard .rvt{font-weight:600;font-size:13.5px;margin-bottom:5px;}
+  .revcard .rvm{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;}
+  .revcard .due{color:var(--hard);font-weight:600;}
+  .revcard .soon{color:var(--medium);font-weight:600;}
+  .insight{background:var(--green-soft);border:1px solid rgba(26,107,90,.2);border-radius:10px;padding:15px 16px;}
+  .insight .it{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);font-weight:700;margin-bottom:6px;}
+  .insight p{margin:0;font-size:13px;color:#2b463f;line-height:1.5;}
+
+  .note{font-size:12.5px;color:var(--faint);margin-top:20px;font-style:italic;}
+  @media (max-width:900px){.surfaces{grid-template-columns:1fr}.tok-grid{grid-template-columns:1fr}.dgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">ShekseCodeSync · UI Design Direction</div>
+  <h1 class="display">A quiet, typographic home for <span class="br">[every problem you solve]</span>.</h1>
+  <p class="lede">Inspired by axi.md - warm paper, a serif display face, and one confident green. Two surfaces share one system: the browser plugin popup and the web dashboard. Below are the locked tokens and full mockups for sign-off.</p>
+
+  <hr class="rule">
+
+  <!-- TOKENS -->
+  <section>
+    <div class="eyebrow">Foundations</div>
+    <h2 class="sec">The <span class="br">[design tokens]</span>.</h2>
+    <p class="sec-sub">Lifted from axi.md's real stack, then made ShekseCodeSync's own. These become CSS variables + Tailwind theme.</p>
+    <div class="tok-grid">
+      <div class="card">
+        <h3>Palette</h3>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#F5F2ED"></div><div class="name">Paper</div><div class="hex">#F5F2ED</div></div>
+          <div class="sw"><div class="chip" style="background:#ECEAE4"></div><div class="name">Surface</div><div class="hex">#ECEAE4</div></div>
+          <div class="sw"><div class="chip" style="background:#D1CCC4"></div><div class="name">Border</div><div class="hex">#D1CCC4</div></div>
+          <div class="sw"><div class="chip" style="background:#1A1A1A"></div><div class="name">Ink</div><div class="hex">#1A1A1A</div></div>
+          <div class="sw"><div class="chip" style="background:#6B6560"></div><div class="name">Muted</div><div class="hex">#6B6560</div></div>
+          <div class="sw"><div class="chip" style="background:#1A6B5A"></div><div class="name">Green</div><div class="hex">#1A6B5A</div></div>
+          <div class="sw"><div class="chip" style="background:#B4791F"></div><div class="name">Medium</div><div class="hex">#B4791F</div></div>
+          <div class="sw"><div class="chip" style="background:#B03A2E"></div><div class="name">Hard</div><div class="hex">#B03A2E</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Typography</h3>
+        <div class="type-row"><div><div class="samp-serif" style="font-size:24px;font-weight:600">Source Serif 4</div></div><div class="lbl">Display</div></div>
+        <div class="type-row"><div><div class="samp-sans" style="font-size:17px;font-weight:500">Inter — interface &amp; body</div></div><div class="lbl">UI</div></div>
+        <div class="type-row"><div><div class="samp-mono" style="font-size:14px">JetBrains Mono · O(n log n)</div></div><div class="lbl">Code</div></div>
+        <div class="type-row"><div><div class="eyebrow">All-caps eyebrow label</div></div><div class="lbl">Meta</div></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- SURFACES -->
+  <section>
+    <div class="eyebrow">Surfaces</div>
+    <h2 class="sec">Two views, <span class="br">[one system]</span>.</h2>
+    <p class="sec-sub">The plugin popup is a compact sibling of the dashboard - same paper, same serif, same green. Capture on the left; review, revise, and see insights on the right.</p>
+
+    <div class="surfaces">
+      <!-- PLUGIN POPUP -->
+      <div>
+        <div class="surface-label">Browser Plugin · Popup</div>
+        <div class="popup">
+          <div class="top">
+            <div class="brand"><span class="dot"></span>ShekseCodeSync</div>
+            <div class="status"><span class="led"></span>Connected</div>
+          </div>
+          <div class="body">
+            <div class="detect">Accepted submission detected</div>
+            <div class="prob">
+              <div class="ptitle">1. Two Sum</div>
+              <div class="badges">
+                <span class="badge easy">Easy</span>
+                <span class="badge pattern">Hash Map</span>
+                <span class="badge lang">Python3</span>
+              </div>
+              <div class="metrics">
+                <div class="metric"><div class="mv">64 ms</div><div class="ml">Runtime · 92%</div></div>
+                <div class="metric"><div class="mv">17.2 MB</div><div class="ml">Memory · 61%</div></div>
+              </div>
+            </div>
+            <button class="btn">Pull &amp; Send to GitHub <span class="arw">→</span></button>
+            <div class="recent">
+              <div class="rh">Recent syncs</div>
+              <div class="ritem"><div class="rn">Valid Parentheses <small>neetcode · stack</small></div><div class="rs"><span class="c"></span>Synced</div></div>
+              <div class="ritem"><div class="rn">Merge Intervals <small>leetcode · sorting</small></div><div class="rs"><span class="c"></span>Synced</div></div>
+              <div class="ritem"><div class="rn">LRU Cache <small>leetcode · design</small></div><div class="rs"><span class="c"></span>Synced</div></div>
+            </div>
+          </div>
+          <div class="foot">
+            <a href="#">Open dashboard ↗</a>
+            <a href="#">Settings</a>
+          </div>
+        </div>
+        <p class="note">~360px popup. Compact, single primary action, glanceable status.</p>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div>
+        <div class="surface-label">Web Dashboard</div>
+        <div class="dash">
+          <div class="dnav">
+            <div class="left">
+              <div class="nav-brand"><span class="dot"></span>ShekseCodeSync</div>
+              <nav>
+                <a href="#" class="active">Overview</a>
+                <a href="#">Problems</a>
+                <a href="#">Revision</a>
+                <a href="#">Insights</a>
+              </nav>
+            </div>
+            <div class="avatar">SS</div>
+          </div>
+
+          <div class="dhero">
+            <div class="eyebrow">Wednesday, July 26</div>
+            <h2>You've solved <span class="br">247 problems</span>, and 6 are due for revision.</h2>
+            <div class="stats">
+              <div class="stat"><div class="sv">247</div><div class="sl">Solved</div><div class="sd">+12 this week</div></div>
+              <div class="stat"><div class="sv">18</div><div class="sl">Day streak</div><div class="sd">personal best</div></div>
+              <div class="stat"><div class="sv">14</div><div class="sl">Patterns</div><div class="sd">of 22 mastered</div></div>
+              <div class="stat"><div class="sv" style="color:var(--medium)">6</div><div class="sl">Due today</div><div class="sd">revision queue</div></div>
+            </div>
+          </div>
+
+          <div class="dgrid">
+            <div class="main">
+              <div class="panel-h"><h3>Recent submissions</h3><a href="#">View all →</a></div>
+              <table>
+                <thead><tr><th>Problem</th><th>Difficulty</th><th>Pattern</th><th>Solved</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="tt">1. Two Sum</span></td><td><span class="pill easy">Easy</span></td><td class="patt">Hash Map</td><td class="num">2m ago</td></tr>
+                  <tr><td><span class="tt">146. LRU Cache</span></td><td><span class="pill medium">Medium</span></td><td class="patt">Design</td><td class="num">1h ago</td></tr>
+                  <tr><td><span class="tt">42. Trapping Rain Water</span></td><td><span class="pill hard">Hard</span></td><td class="patt">Two Pointers</td><td class="num">3h ago</td></tr>
+                  <tr><td><span class="tt">56. Merge Intervals</span></td><td><span class="pill medium">Medium</span></td><td class="patt">Sorting</td><td class="num">yesterday</td></tr>
+                  <tr><td><span class="tt">20. Valid Parentheses</span></td><td><span class="pill easy">Easy</span></td><td class="patt">Stack</td><td class="num">yesterday</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="side">
+              <div class="panel-h"><h3>Revision queue</h3></div>
+              <div class="revcard"><div class="rvt">3. Longest Substring</div><div class="rvm"><span>Sliding Window</span><span class="due">Due now</span></div></div>
+              <div class="revcard"><div class="rvt">207. Course Schedule</div><div class="rvm"><span>Graph · Topo Sort</span><span class="soon">In 2 days</span></div></div>
+              <div class="revcard"><div class="rvt">300. LIS</div><div class="rvm"><span>Dynamic Programming</span><span class="soon">In 4 days</span></div></div>
+              <div class="insight" style="margin-top:16px">
+                <div class="it">AI Insight</div>
+                <p>Your graph solutions lean on BFS. Try the DFS variant on Course Schedule to round out the pattern.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="note">Content-first: serif headline states the day's story, stats row, submissions table (read-path #13), revision + AI insight rail.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+  <p style="color:var(--muted);font-size:13px">Fonts via Google Fonts in this mockup; in-product they'll be self-hosted (next/font) for offline + performance. Difficulty amber/red are additions to axi's neutral+green base, needed to encode Easy/Medium/Hard.</p>
+
+</div>
+</body>
+</html>
