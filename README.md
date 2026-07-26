@@ -10,6 +10,7 @@ Monorepo scaffolded and green in CI; first MVP read-path slice done. See the doc
 - [Tech Stack](docs/TECH_STACK.md)
 - [Decision Log](docs/DECISIONS.md)
 - [Design Direction](docs/DESIGN.md)
+- [Feature Ideas (v2+ candidates)](docs/FEATURE_IDEAS.md) — draft brainstorm for review
 
 ## Where we are / what's next (source of truth = GitHub issues)
 
