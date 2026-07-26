@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ShekseCodeSync — locked design tokens (see docs/DESIGN.md). */
+:root {
+  --paper: #f5f2ed;
+  --surface: #eceae4;
+  --surface-2: #e2ded7;
+  --border: #d1ccc4;
+  --ink: #1a1a1a;
+  --muted: #6b6560;
+  --faint: #908a82;
+  --green: #1a6b5a;
+  --green-soft: rgba(26, 107, 90, 0.1);
+  --medium: #b4791f;
+  --hard: #b03a2e;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
