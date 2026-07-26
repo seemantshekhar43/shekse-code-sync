@@ -51,3 +51,12 @@ Replaced the hardcoded `demo-user` on the API with real per-user auth: captures 
 |---|---|---|---|
 | 25 | Token scheme | Signed JWT `{sub: userId}`, HS256 with a shared `SCS_TOKEN_SECRET` (web mints, api verifies statelessly via `jose`); long-lived (365d) since it is pasted into the extension | Opaque DB-stored token - avoided a schema change and a per-request DB lookup; tradeoff is revocation via secret rotation/expiry, not instant |
 | 26 | User persistence | Auth.js stays on JWT sessions with **no** Prisma adapter; the `jwt` callback upserts a `User` row by GitHub email and carries its cuid as `userId` | Prisma adapter (Account/Session/VerificationToken tables) - unneeded because repo writes use the separate GitHub App, not this login |
+
+## 2026-07-26 - Per-user GitHub App install flow (issue #25)
+
+Replaced the `DEMO_GITHUB_*` env bridge with a real per-user install flow: each user connects the GitHub App to their own repo, and the API resolves the sync target from the `User` row (`githubInstallationId` / `githubRepo`) set at install time, skipping the repo write when either is unset.
+
+| # | Decision | Choice | Alternative considered |
+|---|---|---|---|
+| 27 | Repo resolution | Auto from the installation: the `/github/installed` redirect resolves accessible repos via a short-lived installation token - persist automatically when exactly one, else hand off to a picker page | Manual owner/repo entry field - avoided mismatches with what the App is actually installed on |
+| 28 | Install callback gate | The callback requires an Auth.js session and verifies the installation's account is a `User` whose login matches the signed-in user (orgs rejected until admin verification ships); an optional signed `state` nonce binds our own install link to the user | Trusting the callback's `installation_id` directly - left a cross-account installation-hijacking hole |

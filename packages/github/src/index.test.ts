@@ -4,6 +4,8 @@ import {
   commitFilesWith,
   extForLanguage,
   getFileContentWith,
+  getInstallationAccountWith,
+  listInstallationReposWith,
   type OctokitLike,
   parseRepo,
   slugify,
@@ -84,6 +86,59 @@ describe("commitFilesWith", () => {
     await commitFilesWith({ request }, params);
 
     expect(putBody(request).sha).toBe("abc123");
+  });
+});
+
+describe("listInstallationReposWith", () => {
+  it("maps the installation repositories to owner/repo/fullName", async () => {
+    const request = vi.fn(async () => ({
+      data: {
+        repositories: [
+          { name: "solutions", owner: { login: "octocat" }, full_name: "octocat/solutions" },
+          { name: "dsa", owner: { login: "octocat" }, full_name: "octocat/dsa" },
+        ],
+      },
+    }));
+
+    const repos = await listInstallationReposWith({ request });
+
+    expect(repos).toEqual([
+      { owner: "octocat", repo: "solutions", fullName: "octocat/solutions" },
+      { owner: "octocat", repo: "dsa", fullName: "octocat/dsa" },
+    ]);
+    expect(request).toHaveBeenCalledWith(
+      "GET /installation/repositories",
+      expect.objectContaining({ per_page: 100 }),
+    );
+  });
+
+  it("returns an empty list when there are no repositories", async () => {
+    const request = vi.fn(async () => ({ data: {} }));
+    expect(await listInstallationReposWith({ request })).toEqual([]);
+  });
+});
+
+describe("getInstallationAccountWith", () => {
+  it("returns the installation's account login and type", async () => {
+    const request = vi.fn(async () => ({
+      data: { account: { login: "octocat", type: "User" } },
+    }));
+
+    const account = await getInstallationAccountWith({ request }, 149148749);
+
+    expect(account).toEqual({ login: "octocat", type: "User" });
+    expect(request).toHaveBeenCalledWith(
+      "GET /app/installations/{installation_id}",
+      expect.objectContaining({ installation_id: 149148749 }),
+    );
+  });
+
+  it("throws when the installation has no resolvable account", async () => {
+    const request = vi.fn(async () => ({ data: { account: null } }));
+
+    await expect(getInstallationAccountWith({ request }, 1)).rejects.toThrow(
+      /no resolvable account/,
+    );
   });
 });
 

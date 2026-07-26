@@ -92,28 +92,16 @@ export class SubmissionsService {
   }
 
   /**
-   * Resolve the capturing user, ensuring a row exists.
-   *
-   * MVP bridge: real users arrive via auth (#16); until then the extension posts
-   * as a fixed demo user, whose GitHub install/repo are seeded from env so the
-   * write path can run end-to-end.
+   * Resolve the capturing user's GitHub sync target. The row is created at web
+   * login and its `githubInstallationId` / `githubRepo` are set when the user
+   * installs the GitHub App (see the web `/github/installed` flow). If either is
+   * unset the caller skips the repo write and indexes only.
    */
   private async ensureUser(userId: string) {
-    const demoInstallationId = process.env.DEMO_GITHUB_INSTALLATION_ID;
-    const demoRepo = process.env.DEMO_GITHUB_REPO;
-    const update: { githubInstallationId?: string; githubRepo?: string } = {};
-    if (demoInstallationId) update.githubInstallationId = demoInstallationId;
-    if (demoRepo) update.githubRepo = demoRepo;
-    return prisma.user.upsert({
+    const user = await prisma.user.findUnique({
       where: { id: userId },
-      update,
-      create: {
-        id: userId,
-        email: `${userId}@shekse.local`,
-        githubInstallationId: demoInstallationId || null,
-        githubRepo: demoRepo || null,
-      },
       select: { githubInstallationId: true, githubRepo: true },
     });
+    return user ?? { githubInstallationId: null, githubRepo: null };
   }
 }

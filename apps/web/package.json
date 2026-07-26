@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@scs/db": "workspace:*",
+    "@scs/github": "workspace:*",
     "@scs/types": "workspace:*",
     "jose": "^5.9.6",
     "next": "^14.2.13",

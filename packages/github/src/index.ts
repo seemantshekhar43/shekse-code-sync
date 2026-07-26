@@ -50,6 +50,79 @@ export async function getInstallationOctokit(installationId: number) {
   return getApp().getInstallationOctokit(installationId);
 }
 
+export interface InstallationRepo {
+  owner: string;
+  repo: string;
+  fullName: string; // "owner/repo"
+}
+
+/** List an installation's accessible repositories using the given octokit client. */
+export async function listInstallationReposWith(
+  octokit: OctokitLike,
+): Promise<InstallationRepo[]> {
+  const res = await octokit.request("GET /installation/repositories", {
+    per_page: 100,
+  });
+  const data = res.data as {
+    repositories?: Array<{ name: string; owner: { login: string }; full_name: string }>;
+  };
+  return (data.repositories ?? []).map((r) => ({
+    owner: r.owner.login,
+    repo: r.name,
+    fullName: r.full_name,
+  }));
+}
+
+/**
+ * List the repositories a user's installation can access, via its short-lived
+ * installation token. Used by the web install callback to resolve which repo to
+ * persist as the user's sync target.
+ */
+export async function listInstallationRepos(
+  installationId: number,
+): Promise<InstallationRepo[]> {
+  const octokit = (await getInstallationOctokit(installationId)) as OctokitLike;
+  return listInstallationReposWith(octokit);
+}
+
+export interface InstallationAccount {
+  login: string;
+  /** "User" or "Organization". */
+  type: string;
+}
+
+/**
+ * Read the account (user or org) a GitHub App installation belongs to, using the
+ * given app-authenticated octokit client. Calls the APP-level endpoint, so the
+ * client must be the App's own (JWT) octokit, not an installation-scoped one.
+ */
+export async function getInstallationAccountWith(
+  octokit: OctokitLike,
+  installationId: number,
+): Promise<InstallationAccount> {
+  const res = await octokit.request("GET /app/installations/{installation_id}", {
+    installation_id: installationId,
+  });
+  const data = res.data as { account?: { login?: string; type?: string } | null };
+  const account = data.account;
+  if (!account?.login || !account.type) {
+    throw new Error(`Installation ${installationId} has no resolvable account`);
+  }
+  return { login: account.login, type: account.type };
+}
+
+/**
+ * Resolve which account a user's installation belongs to. Used by the web install
+ * callback to verify the installing user actually owns the installation before
+ * persisting it, closing the cross-account installation-hijacking hole.
+ */
+export async function getInstallationAccount(
+  installationId: number,
+): Promise<InstallationAccount> {
+  const octokit = getApp().octokit as unknown as OctokitLike;
+  return getInstallationAccountWith(octokit, installationId);
+}
+
 /** Split a stored `"owner/repo"` string into its parts. */
 export function parseRepo(full: string): { owner: string; repo: string } {
   const [owner, repo, ...rest] = full.split("/");

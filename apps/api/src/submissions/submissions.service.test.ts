@@ -6,7 +6,7 @@ import { SubmissionsService } from "./submissions.service.js";
 
 vi.mock("@scs/db", () => ({
   prisma: {
-    user: { upsert: vi.fn() },
+    user: { findUnique: vi.fn() },
     submission: { upsert: vi.fn() },
   },
 }));
@@ -44,7 +44,7 @@ describe("SubmissionsService.capture", () => {
   });
 
   it("commits to GitHub when the user has an installation wired", async () => {
-    vi.mocked(prisma.user.upsert).mockResolvedValue({
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
       githubInstallationId: "42",
       githubRepo: "octocat/solutions",
     } as never);
@@ -67,7 +67,7 @@ describe("SubmissionsService.capture", () => {
   });
 
   it("skips the repo write when no installation is wired", async () => {
-    vi.mocked(prisma.user.upsert).mockResolvedValue({
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
       githubInstallationId: null,
       githubRepo: null,
     } as never);
@@ -81,7 +81,7 @@ describe("SubmissionsService.capture", () => {
   });
 
   it("does not index when the GitHub commit fails (GitHub is source of truth)", async () => {
-    vi.mocked(prisma.user.upsert).mockResolvedValue({
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
       githubInstallationId: "42",
       githubRepo: "octocat/solutions",
     } as never);
