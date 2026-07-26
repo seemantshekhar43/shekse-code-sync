@@ -4,11 +4,25 @@ Capture every DSA problem you solve on LeetCode / NeetCode, version-control the 
 
 ## Status
 
-Planning complete; scaffolding next. See the docs:
+Monorepo scaffolded and green in CI; first MVP read-path slice done. See the docs:
 
 - [Product Requirements](docs/PRD.md)
 - [Tech Stack](docs/TECH_STACK.md)
 - [Decision Log](docs/DECISIONS.md)
+- [Design Direction](docs/DESIGN.md)
+
+## Where we are / what's next (source of truth = GitHub issues)
+
+Work is tracked as GitHub issues; **open issues are the backlog, closed issues are done**.
+
+```bash
+gh-axi issue list --state open      # what's next
+gh-axi issue list --state closed    # what's done
+```
+
+Done so far: PRD + tech stack signed off, monorepo scaffolded (apps + shared packages, Docker, CI), read-path MVP slice (list submissions). Next up (open issues): finalize UI design in lavish, capture write-path (commit to GitHub), extension LeetCode capture, real AI analysis in the worker.
+
+The working conventions (issue-driven flow, lavish for planning/design, no-mistakes gate for feature work, chrome-devtools-axi for UI verification) live in [`CLAUDE.md`](CLAUDE.md), which a fresh Claude Code session loads automatically.
 
 ## The five pillars
 
