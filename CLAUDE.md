@@ -9,6 +9,26 @@ ShekseCodeSync captures every DSA problem solved on LeetCode / NeetCode, version
 - `docs/PRD.md` — product requirements (vision, pillars, data model, roadmap, auth).
 - `docs/TECH_STACK.md` — the chosen stack and monorepo shape.
 - `docs/DECISIONS.md` — decision log; append new significant decisions here.
+- `docs/DESIGN.md` — UI design direction (axi.md-inspired; finalize in lavish before building any UI).
+
+## Orienting — start of every session
+
+The **GitHub issue board is the source of truth for status** (open = backlog, closed = done):
+
+```bash
+npx -y gh-axi issue list --state open      # what's next
+npx -y gh-axi issue list --state closed    # what's done
+```
+
+Then read `docs/` for context. This file holds the conventions; the repo + issues hold the state, so a fresh session loses nothing.
+
+## Tooling — which tool for what
+
+- **gh-axi** — all GitHub operations (issues, PRs, CI, repos): `npx -y gh-axi <cmd>`. Never raw `gh` for these.
+- **lavish** — reviewable artifacts for planning and big/design decisions (PRD, tech stack, UI look-and-feel). See "Planning & big decisions".
+- **no-mistakes** — local validation gate for non-trivial feature work (AI review, tests, lint, push, PR, CI). See "Validating changes".
+- **chrome-devtools-axi** — drive a real Chrome session to verify web dashboard / extension UI.
+- **pnpm + turbo** — workspace tasks (install, dev, build, typecheck, lint, test). See "Running the project" / "Testing".
 
 ## Working pattern (follow this on every task)
 
