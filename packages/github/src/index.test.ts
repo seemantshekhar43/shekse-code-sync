@@ -4,6 +4,7 @@ import {
   commitFilesWith,
   extForLanguage,
   getFileContentWith,
+  getInstallationAccountWith,
   listInstallationReposWith,
   type OctokitLike,
   parseRepo,
@@ -114,6 +115,30 @@ describe("listInstallationReposWith", () => {
   it("returns an empty list when there are no repositories", async () => {
     const request = vi.fn(async () => ({ data: {} }));
     expect(await listInstallationReposWith({ request })).toEqual([]);
+  });
+});
+
+describe("getInstallationAccountWith", () => {
+  it("returns the installation's account login and type", async () => {
+    const request = vi.fn(async () => ({
+      data: { account: { login: "octocat", type: "User" } },
+    }));
+
+    const account = await getInstallationAccountWith({ request }, 149148749);
+
+    expect(account).toEqual({ login: "octocat", type: "User" });
+    expect(request).toHaveBeenCalledWith(
+      "GET /app/installations/{installation_id}",
+      expect.objectContaining({ installation_id: 149148749 }),
+    );
+  });
+
+  it("throws when the installation has no resolvable account", async () => {
+    const request = vi.fn(async () => ({ data: { account: null } }));
+
+    await expect(getInstallationAccountWith({ request }, 1)).rejects.toThrow(
+      /no resolvable account/,
+    );
   });
 });
 

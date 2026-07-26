@@ -1,12 +1,11 @@
-import { listInstallationRepos } from "@scs/github";
 import { NextResponse } from "next/server";
 import { auth } from "../../../auth";
-import { persistInstallation } from "../../../lib/github-install";
+import { persistInstallation, resolveInstallationForUser } from "../../../lib/github-install";
 
 /**
  * GitHub App post-install redirect (Setup URL). GitHub sends
- * `?installation_id=...&setup_action=install`. We resolve which repo the
- * installation grants access to and persist it against the logged-in user.
+ * `?installation_id=...&setup_action=install`. We verify the signed-in user owns
+ * the installation, resolve which repo it grants access to, and persist it.
  * One repo -> persist automatically; several -> hand off to the picker.
  */
 export async function GET(req: Request): Promise<Response> {
@@ -26,7 +25,17 @@ export async function GET(req: Request): Promise<Response> {
     return NextResponse.redirect(new URL("/?github=missing_installation", url.origin));
   }
 
-  const repos = await listInstallationRepos(installationId);
+  const resolved = await resolveInstallationForUser({
+    installationId,
+    userId: session.userId,
+    githubLogin: session.githubLogin,
+    state: url.searchParams.get("state") ?? undefined,
+  });
+  if (!resolved.ok) {
+    return NextResponse.redirect(new URL(`/?github=${resolved.reason}`, url.origin));
+  }
+
+  const repos = resolved.repos;
   if (repos.length === 0) {
     return NextResponse.redirect(new URL("/?github=no_repos", url.origin));
   }

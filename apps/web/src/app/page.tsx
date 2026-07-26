@@ -1,13 +1,22 @@
 import { prisma } from "@scs/db";
 import { type SubmissionSummary, SubmissionSummary as SummarySchema } from "@scs/types";
 import { auth, signIn, signOut } from "../auth";
-import { mintScsToken } from "../lib/scs-token";
+import { mintInstallState, mintScsToken } from "../lib/scs-token";
 import { TokenField } from "./TokenField";
 
 const installBanner: Record<string, { text: string; ok: boolean }> = {
   connected: { text: "GitHub repo connected. Captures will commit there.", ok: true },
   no_repos: { text: "The installation had no accessible repositories.", ok: false },
   missing_installation: { text: "No installation id in the GitHub redirect.", ok: false },
+  forbidden: {
+    text: "That GitHub App installation isn't on your account, so it wasn't connected.",
+    ok: false,
+  },
+  org_unsupported: {
+    text: "Organization installations aren't supported yet. Install on a repo you own.",
+    ok: false,
+  },
+  error: { text: "Couldn't reach GitHub to finish connecting. Please try again.", ok: false },
 };
 
 async function getSubmissions(token: string): Promise<SubmissionSummary[]> {
@@ -78,8 +87,9 @@ export default async function HomePage({
     }),
   ]);
   const appSlug = process.env.NEXT_PUBLIC_GITHUB_APP_SLUG;
+  const installState = await mintInstallState(session.userId);
   const installUrl = appSlug
-    ? `https://github.com/apps/${appSlug}/installations/new`
+    ? `https://github.com/apps/${appSlug}/installations/new?state=${encodeURIComponent(installState)}`
     : undefined;
   const banner = searchParams.github ? installBanner[searchParams.github] : undefined;
 

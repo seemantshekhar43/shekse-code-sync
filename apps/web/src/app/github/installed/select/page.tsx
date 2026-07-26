@@ -1,7 +1,6 @@
-import { listInstallationRepos } from "@scs/github";
 import { redirect } from "next/navigation";
 import { auth } from "../../../../auth";
-import { persistInstallation } from "../../../../lib/github-install";
+import { persistInstallation, resolveInstallationForUser } from "../../../../lib/github-install";
 
 /**
  * Repo picker for the multi-repo install case: the installation grants access
@@ -10,7 +9,7 @@ import { persistInstallation } from "../../../../lib/github-install";
 export default async function SelectRepoPage({
   searchParams,
 }: {
-  searchParams: { installation_id?: string };
+  searchParams: { installation_id?: string; state?: string };
 }) {
   const session = await auth();
   if (!session?.userId) redirect("/");
@@ -21,7 +20,15 @@ export default async function SelectRepoPage({
   }
 
   const userId = session.userId;
-  const repos = await listInstallationRepos(installationId);
+  const resolved = await resolveInstallationForUser({
+    installationId,
+    userId,
+    githubLogin: session.githubLogin,
+    state: searchParams.state,
+  });
+  if (!resolved.ok) redirect(`/?github=${resolved.reason}`);
+
+  const repos = resolved.repos;
   if (repos.length === 0) redirect("/?github=no_repos");
   if (repos.length === 1) {
     await persistInstallation(userId, installationId, repos[0].fullName);

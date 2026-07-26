@@ -67,12 +67,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
           token.userId = user.id;
         }
+        // GitHub login (handle), used to verify App-install ownership later.
+        const login = (profile as { login?: unknown }).login;
+        if (typeof login === "string") {
+          token.githubLogin = login;
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (token.userId) {
         session.userId = token.userId as string;
+      }
+      if (token.githubLogin) {
+        session.githubLogin = token.githubLogin as string;
       }
       return session;
     },
