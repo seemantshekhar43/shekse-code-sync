@@ -42,3 +42,12 @@ Look-and-feel for **both** the browser plugin popup and the web dashboard, final
 | 22 | Palette | Paper `#F5F2ED`, ink `#1A1A1A`, green `#1A6B5A`; amber/red added for difficulty | Warm neutral base from axi.md; amber/red needed to encode Easy/Medium/Hard |
 | 23 | Two surfaces, one system | Popup is a compact sibling of the dashboard (same tokens) | Consistent product feel across capture and review |
 | 24 | Overview table | No GitHub sync-status column on the overview; it lives on the detailed problems grid | Keep the overview scannable; sync detail belongs in the drill-down |
+
+## 2026-07-26 - Per-user auth for the ShekseCodeSync token (issue #26)
+
+Replaced the hardcoded `demo-user` on the API with real per-user auth: captures and dashboard reads are scoped to the signed-in user, and missing/invalid tokens are rejected 401.
+
+| # | Decision | Choice | Alternative considered |
+|---|---|---|---|
+| 25 | Token scheme | Signed JWT `{sub: userId}`, HS256 with a shared `SCS_TOKEN_SECRET` (web mints, api verifies statelessly via `jose`); long-lived (365d) since it is pasted into the extension | Opaque DB-stored token - avoided a schema change and a per-request DB lookup; tradeoff is revocation via secret rotation/expiry, not instant |
+| 26 | User persistence | Auth.js stays on JWT sessions with **no** Prisma adapter; the `jwt` callback upserts a `User` row by GitHub email and carries its cuid as `userId` | Prisma adapter (Account/Session/VerificationToken tables) - unneeded because repo writes use the separate GitHub App, not this login |

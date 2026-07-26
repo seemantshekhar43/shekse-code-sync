@@ -1,22 +1,24 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { CaptureSubmission, type SubmissionSummary } from "@scs/types";
+import { CurrentUserId, ScsAuthGuard } from "../auth/scs-auth.guard.js";
 import { SubmissionsService } from "./submissions.service.js";
 
-// TODO: resolve userId from the authenticated ShekseCodeSync token.
-const DEMO_USER_ID = "demo-user";
-
 @Controller("submissions")
+@UseGuards(ScsAuthGuard)
 export class SubmissionsController {
   constructor(private readonly submissions: SubmissionsService) {}
 
   @Get()
-  async list(): Promise<SubmissionSummary[]> {
-    return this.submissions.list(DEMO_USER_ID);
+  async list(@CurrentUserId() userId: string): Promise<SubmissionSummary[]> {
+    return this.submissions.list(userId);
   }
 
   @Post()
-  async capture(@Body() body: unknown): Promise<{ id: string }> {
+  async capture(
+    @CurrentUserId() userId: string,
+    @Body() body: unknown,
+  ): Promise<{ id: string }> {
     const input = CaptureSubmission.parse(body);
-    return this.submissions.capture(DEMO_USER_ID, input);
+    return this.submissions.capture(userId, input);
   }
 }
