@@ -10,7 +10,7 @@
     "postinstall": "wxt prepare",
     "typecheck": "wxt prepare && tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "lint": "eslint entrypoints"
+    "lint": "eslint entrypoints lib"
   },
   "dependencies": {
     "@scs/types": "workspace:*",
