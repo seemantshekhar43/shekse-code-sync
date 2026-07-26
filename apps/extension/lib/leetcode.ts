@@ -153,8 +153,14 @@ export async function pullCapture(titleSlug: string): Promise<CaptureSubmission>
   if (!question) throw new Error(`Problem "${titleSlug}" not found on LeetCode.`);
 
   const { questionSubmissionList } = await graphql<{
-    questionSubmissionList: { submissions: Omit<LeetCodeSubmission, "code">[] };
+    questionSubmissionList: { submissions: Omit<LeetCodeSubmission, "code">[] } | null;
   }>(SUBMISSIONS_QUERY, { offset: 0, limit: 20, questionSlug: titleSlug });
+
+  if (!questionSubmissionList?.submissions) {
+    throw new Error(
+      "Could not read your LeetCode submissions - make sure you are logged in to leetcode.com.",
+    );
+  }
 
   const accepted = questionSubmissionList.submissions.find(
     (s) => s.statusDisplay === "Accepted",
@@ -170,8 +176,14 @@ export async function pullCapture(titleSlug: string): Promise<CaptureSubmission>
       runtimeDisplay: string;
       memoryDisplay: string;
       timestamp: number;
-    };
+    } | null;
   }>(SUBMISSION_DETAILS_QUERY, { submissionId: Number(accepted.id) });
+
+  if (!submissionDetails) {
+    throw new Error(
+      "Could not read your LeetCode submissions - make sure you are logged in to leetcode.com.",
+    );
+  }
 
   return buildCapture(question, {
     ...accepted,
