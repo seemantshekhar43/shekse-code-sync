@@ -4,6 +4,7 @@ import {
   commitFilesWith,
   extForLanguage,
   getFileContentWith,
+  listInstallationReposWith,
   type OctokitLike,
   parseRepo,
   slugify,
@@ -84,6 +85,35 @@ describe("commitFilesWith", () => {
     await commitFilesWith({ request }, params);
 
     expect(putBody(request).sha).toBe("abc123");
+  });
+});
+
+describe("listInstallationReposWith", () => {
+  it("maps the installation repositories to owner/repo/fullName", async () => {
+    const request = vi.fn(async () => ({
+      data: {
+        repositories: [
+          { name: "solutions", owner: { login: "octocat" }, full_name: "octocat/solutions" },
+          { name: "dsa", owner: { login: "octocat" }, full_name: "octocat/dsa" },
+        ],
+      },
+    }));
+
+    const repos = await listInstallationReposWith({ request });
+
+    expect(repos).toEqual([
+      { owner: "octocat", repo: "solutions", fullName: "octocat/solutions" },
+      { owner: "octocat", repo: "dsa", fullName: "octocat/dsa" },
+    ]);
+    expect(request).toHaveBeenCalledWith(
+      "GET /installation/repositories",
+      expect.objectContaining({ per_page: 100 }),
+    );
+  });
+
+  it("returns an empty list when there are no repositories", async () => {
+    const request = vi.fn(async () => ({ data: {} }));
+    expect(await listInstallationReposWith({ request })).toEqual([]);
   });
 });
 

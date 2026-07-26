@@ -1,7 +1,14 @@
+import { prisma } from "@scs/db";
 import { type SubmissionSummary, SubmissionSummary as SummarySchema } from "@scs/types";
 import { auth, signIn, signOut } from "../auth";
 import { mintScsToken } from "../lib/scs-token";
 import { TokenField } from "./TokenField";
+
+const installBanner: Record<string, { text: string; ok: boolean }> = {
+  connected: { text: "GitHub repo connected. Captures will commit there.", ok: true },
+  no_repos: { text: "The installation had no accessible repositories.", ok: false },
+  missing_installation: { text: "No installation id in the GitHub redirect.", ok: false },
+};
 
 async function getSubmissions(token: string): Promise<SubmissionSummary[]> {
   const base = process.env.API_BASE_URL ?? "http://localhost:3001";
@@ -33,7 +40,11 @@ function safeHttpUrl(link: string): string | null {
   }
 }
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: { github?: string };
+}) {
   const session = await auth();
 
   if (!session?.userId) {
@@ -59,7 +70,18 @@ export default async function HomePage() {
   }
 
   const token = await mintScsToken(session.userId);
-  const submissions = await getSubmissions(token);
+  const [submissions, user] = await Promise.all([
+    getSubmissions(token),
+    prisma.user.findUnique({
+      where: { id: session.userId },
+      select: { githubRepo: true },
+    }),
+  ]);
+  const appSlug = process.env.NEXT_PUBLIC_GITHUB_APP_SLUG;
+  const installUrl = appSlug
+    ? `https://github.com/apps/${appSlug}/installations/new`
+    : undefined;
+  const banner = searchParams.github ? installBanner[searchParams.github] : undefined;
 
   return (
     <main className="mx-auto max-w-4xl p-10">
@@ -77,6 +99,51 @@ export default async function HomePage() {
         </form>
       </div>
       <p className="mt-2 text-gray-600">Your solved problems.</p>
+
+      {banner ? (
+        <p
+          className={`mt-4 rounded border px-3 py-2 text-sm ${
+            banner.ok
+              ? "border-green-200 bg-green-50 text-green-700"
+              : "border-red-200 bg-red-50 text-red-700"
+          }`}
+        >
+          {banner.text}
+        </p>
+      ) : null}
+
+      <section className="mt-6 rounded border border-gray-200 p-4">
+        <h2 className="text-sm font-semibold text-gray-700">GitHub repo</h2>
+        {user?.githubRepo ? (
+          <p className="mt-1 text-xs text-gray-500">
+            Syncing to <span className="font-mono text-gray-700">{user.githubRepo}</span>.{" "}
+            {installUrl ? (
+              <a href={installUrl} className="text-gray-700 underline">
+                Manage
+              </a>
+            ) : null}
+          </p>
+        ) : (
+          <div className="mt-1">
+            <p className="text-xs text-gray-500">
+              Install the ShekseCodeSync GitHub App on the repo you want your solutions
+              committed to.
+            </p>
+            {installUrl ? (
+              <a
+                href={installUrl}
+                className="mt-2 inline-block rounded bg-gray-900 px-3 py-1 text-xs font-medium text-white"
+              >
+                Connect GitHub repo
+              </a>
+            ) : (
+              <p className="mt-2 text-xs text-amber-600">
+                Set NEXT_PUBLIC_GITHUB_APP_SLUG to enable one-click install.
+              </p>
+            )}
+          </div>
+        )}
+      </section>
 
       <section className="mt-6 rounded border border-gray-200 p-4">
         <h2 className="text-sm font-semibold text-gray-700">Extension token</h2>

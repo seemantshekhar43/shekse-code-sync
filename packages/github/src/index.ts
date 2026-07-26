@@ -50,6 +50,41 @@ export async function getInstallationOctokit(installationId: number) {
   return getApp().getInstallationOctokit(installationId);
 }
 
+export interface InstallationRepo {
+  owner: string;
+  repo: string;
+  fullName: string; // "owner/repo"
+}
+
+/** List an installation's accessible repositories using the given octokit client. */
+export async function listInstallationReposWith(
+  octokit: OctokitLike,
+): Promise<InstallationRepo[]> {
+  const res = await octokit.request("GET /installation/repositories", {
+    per_page: 100,
+  });
+  const data = res.data as {
+    repositories?: Array<{ name: string; owner: { login: string }; full_name: string }>;
+  };
+  return (data.repositories ?? []).map((r) => ({
+    owner: r.owner.login,
+    repo: r.name,
+    fullName: r.full_name,
+  }));
+}
+
+/**
+ * List the repositories a user's installation can access, via its short-lived
+ * installation token. Used by the web install callback to resolve which repo to
+ * persist as the user's sync target.
+ */
+export async function listInstallationRepos(
+  installationId: number,
+): Promise<InstallationRepo[]> {
+  const octokit = (await getInstallationOctokit(installationId)) as OctokitLike;
+  return listInstallationReposWith(octokit);
+}
+
 /** Split a stored `"owner/repo"` string into its parts. */
 export function parseRepo(full: string): { owner: string; repo: string } {
   const [owner, repo, ...rest] = full.split("/");
