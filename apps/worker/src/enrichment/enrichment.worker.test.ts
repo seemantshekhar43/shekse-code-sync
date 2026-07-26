@@ -107,3 +107,44 @@ describe("EnrichmentWorker.enrich", () => {
     expect(prisma.submission.update).not.toHaveBeenCalled();
   });
 });
+
+describe("EnrichmentWorker.process (BullMQ retry semantics)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(prisma.submission.update).mockResolvedValue({} as never);
+  });
+
+  // process() is the private BullMQ handler; drive it directly with a fake Job.
+  const runProcess = (
+    worker: EnrichmentWorker,
+    job: { data: { submissionId: string }; opts: { attempts?: number }; attemptsMade: number },
+  ): Promise<void> =>
+    (worker as unknown as { process(job: unknown): Promise<void> }).process(job);
+
+  it("rethrows without marking failed on a non-final attempt", async () => {
+    const worker = new EnrichmentWorker();
+    vi.spyOn(worker, "enrich").mockRejectedValue(new Error("GitHub 502"));
+
+    await expect(
+      runProcess(worker, { data: { submissionId: "sub_1" }, opts: { attempts: 5 }, attemptsMade: 0 }),
+    ).rejects.toThrow("GitHub 502");
+
+    // attempt 1 of 5 -> retry, do NOT persist failed yet.
+    expect(prisma.submission.update).not.toHaveBeenCalled();
+  });
+
+  it("marks failed on the final attempt before rethrowing", async () => {
+    const worker = new EnrichmentWorker();
+    vi.spyOn(worker, "enrich").mockRejectedValue(new Error("GitHub 502"));
+
+    await expect(
+      runProcess(worker, { data: { submissionId: "sub_1" }, opts: { attempts: 5 }, attemptsMade: 4 }),
+    ).rejects.toThrow("GitHub 502");
+
+    // attempt 5 of 5 -> record the terminal failure, then rethrow.
+    expect(prisma.submission.update).toHaveBeenCalledWith({
+      where: { id: "sub_1" },
+      data: { enrichment: "failed" },
+    });
+  });
+});
