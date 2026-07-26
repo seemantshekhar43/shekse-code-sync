@@ -99,14 +99,19 @@ export class SubmissionsService {
    * write path can run end-to-end.
    */
   private async ensureUser(userId: string) {
+    const demoInstallationId = process.env.DEMO_GITHUB_INSTALLATION_ID;
+    const demoRepo = process.env.DEMO_GITHUB_REPO;
+    const update: { githubInstallationId?: string; githubRepo?: string } = {};
+    if (demoInstallationId) update.githubInstallationId = demoInstallationId;
+    if (demoRepo) update.githubRepo = demoRepo;
     return prisma.user.upsert({
       where: { id: userId },
-      update: {},
+      update,
       create: {
         id: userId,
         email: `${userId}@shekse.local`,
-        githubInstallationId: process.env.DEMO_GITHUB_INSTALLATION_ID || null,
-        githubRepo: process.env.DEMO_GITHUB_REPO || null,
+        githubInstallationId: demoInstallationId || null,
+        githubRepo: demoRepo || null,
       },
       select: { githubInstallationId: true, githubRepo: true },
     });
