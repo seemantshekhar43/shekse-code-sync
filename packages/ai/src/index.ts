@@ -19,7 +19,7 @@ export interface AiProvider {
   analyze(input: AnalyzeInput): Promise<Analysis>;
 }
 
-function selectModel(): LanguageModel {
+export function selectModel(): LanguageModel {
   const provider = process.env.AI_PROVIDER ?? "anthropic";
   const modelId = process.env.AI_MODEL ?? "claude-opus-4-8";
 
@@ -29,7 +29,12 @@ function selectModel(): LanguageModel {
       return anthropic(modelId);
     }
     case "openai": {
-      const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      // baseURL is optional: unset -> the SDK default (OpenAI); set -> any
+      // OpenAI-compatible endpoint (Azure, Bedrock gateways, self-hosted, ...).
+      const openai = createOpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+        baseURL: process.env.OPENAI_BASE_URL,
+      });
       return openai(modelId);
     }
     case "ollama": {
