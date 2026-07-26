@@ -135,6 +135,51 @@ export async function commitFiles(params: CommitFilesParams): Promise<void> {
   await commitFilesWith(octokit, params);
 }
 
+/** Read and decode a single file's UTF-8 contents from a repo. */
+export async function getFileContentWith(
+  octokit: OctokitLike,
+  owner: string,
+  repo: string,
+  path: string,
+): Promise<string> {
+  const res = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+    owner,
+    repo,
+    path,
+  });
+  const data = res.data as { content?: string; encoding?: string };
+  if (Array.isArray(data) || typeof data.content !== "string") {
+    throw new Error(`Expected a file at ${path}, got a directory or missing content`);
+  }
+  const encoding = data.encoding === "base64" ? "base64" : "utf8";
+  return Buffer.from(data.content, encoding).toString("utf8");
+}
+
+export interface ReadSubmissionParams {
+  installationId: number;
+  owner: string;
+  repo: string;
+  slug: string;
+  language: string;
+}
+
+/** Read back a problem's statement + solution code from the user's repo. */
+export async function readSubmissionFiles(
+  params: ReadSubmissionParams,
+): Promise<{ statement: string; code: string }> {
+  const octokit = (await getInstallationOctokit(params.installationId)) as OctokitLike;
+  const [statement, code] = await Promise.all([
+    getFileContentWith(octokit, params.owner, params.repo, `${params.slug}/question.md`),
+    getFileContentWith(
+      octokit,
+      params.owner,
+      params.repo,
+      `${params.slug}/solution.${extForLanguage(params.language)}`,
+    ),
+  ]);
+  return { statement, code };
+}
+
 /** Build the GitHub files (question.md, solution.<ext>, meta.json) for a capture. */
 export function buildSubmissionFiles(sub: CaptureSubmission): RepoFile[] {
   const meta = {

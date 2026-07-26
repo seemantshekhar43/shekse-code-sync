@@ -47,7 +47,12 @@ function selectModel(): LanguageModel {
 
 const PROMPT = (input: AnalyzeInput) =>
   [
-    `You are reviewing a solved coding problem. Return a concise analysis.`,
+    `You are an expert competitive-programming coach reviewing a solved problem.`,
+    `Analyze the solution below and produce:`,
+    `- timeComplexity and spaceComplexity as Big-O (e.g. "O(n log n)"),`,
+    `- pattern: the canonical algorithmic pattern (e.g. "sliding-window", "hash-map", "dfs"),`,
+    `- optimizationNotes: concise notes on whether and how it could be improved, or confirm it is already optimal.`,
+    `Base the analysis only on the actual code; do not restate the problem.`,
     `Title: ${input.title}`,
     `Language: ${input.language}`,
     `Problem:\n${input.statement}`,

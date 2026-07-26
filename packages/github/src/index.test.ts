@@ -3,6 +3,7 @@ import {
   buildSubmissionFiles,
   commitFilesWith,
   extForLanguage,
+  getFileContentWith,
   type OctokitLike,
   parseRepo,
   slugify,
@@ -83,5 +84,29 @@ describe("commitFilesWith", () => {
     await commitFilesWith({ request }, params);
 
     expect(putBody(request).sha).toBe("abc123");
+  });
+});
+
+describe("getFileContentWith", () => {
+  it("decodes base64 file contents to utf-8", async () => {
+    const request = vi.fn(async (_route: string, _params: Record<string, unknown>) => ({
+      data: { content: Buffer.from("# Two Sum", "utf8").toString("base64"), encoding: "base64" },
+    }));
+
+    const content = await getFileContentWith({ request }, "octocat", "solutions", "two-sum/question.md");
+
+    expect(content).toBe("# Two Sum");
+    expect(request).toHaveBeenCalledWith(
+      "GET /repos/{owner}/{repo}/contents/{path}",
+      expect.objectContaining({ path: "two-sum/question.md" }),
+    );
+  });
+
+  it("throws when the path is a directory (array response)", async () => {
+    const request = vi.fn(async () => ({ data: [{ name: "solution.py" }] }));
+
+    await expect(
+      getFileContentWith({ request }, "octocat", "solutions", "two-sum"),
+    ).rejects.toThrow(/Expected a file/);
   });
 });

@@ -167,6 +167,9 @@ importers:
       '@scs/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@scs/github':
+        specifier: workspace:*
+        version: link:../../packages/github
       '@scs/types':
         specifier: workspace:*
         version: link:../../packages/types

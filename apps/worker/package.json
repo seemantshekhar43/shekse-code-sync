@@ -16,6 +16,7 @@
     "@nestjs/core": "^10.4.4",
     "@scs/ai": "workspace:*",
     "@scs/db": "workspace:*",
+    "@scs/github": "workspace:*",
     "@scs/types": "workspace:*",
     "bullmq": "^5.13.2",
     "reflect-metadata": "^0.2.2",
