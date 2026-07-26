@@ -20,7 +20,7 @@ gh-axi issue list --state open      # what's next
 gh-axi issue list --state closed    # what's done
 ```
 
-Done so far: PRD + tech stack signed off, monorepo scaffolded (apps + shared packages, Docker, CI), read-path MVP slice (list submissions). Next up (open issues): finalize UI design in lavish, capture write-path (commit to GitHub), extension LeetCode capture, real AI analysis in the worker.
+Done so far: PRD + tech stack signed off, monorepo scaffolded (apps + shared packages, Docker, CI), read-path MVP slice (list submissions), capture write-path MVP slice (commit each problem to the user's GitHub repo on capture, GitHub as source of truth). Next up (open issues): finalize UI design in lavish, extension LeetCode capture, real AI analysis in the worker.
 
 The working conventions (issue-driven flow, lavish for planning/design, no-mistakes gate for feature work, chrome-devtools-axi for UI verification) live in [`CLAUDE.md`](CLAUDE.md), which a fresh Claude Code session loads automatically.
 

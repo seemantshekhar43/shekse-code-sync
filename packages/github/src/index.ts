@@ -50,6 +50,15 @@ export async function getInstallationOctokit(installationId: number) {
   return getApp().getInstallationOctokit(installationId);
 }
 
+/** Split a stored `"owner/repo"` string into its parts. */
+export function parseRepo(full: string): { owner: string; repo: string } {
+  const [owner, repo, ...rest] = full.split("/");
+  if (!owner || !repo || rest.length > 0) {
+    throw new Error(`Invalid repo "${full}", expected "owner/repo"`);
+  }
+  return { owner, repo };
+}
+
 export interface RepoFile {
   path: string;
   content: string;
@@ -65,21 +74,65 @@ export interface CommitFilesParams {
 }
 
 /**
- * Commit the files for one problem under `<slug>/` in the user's repo.
- * NOTE (scaffold): this uses the Contents API create path; updating an existing
- * file requires passing its blob `sha`. Wire that in when the capture flow lands.
+ * Minimal shape of the octokit client we use, so the commit logic can be
+ * unit-tested with a fake in place of a real installation client.
  */
-export async function commitFiles(params: CommitFilesParams): Promise<void> {
-  const octokit = await getInstallationOctokit(params.installationId);
+export interface OctokitLike {
+  request(
+    route: string,
+    params: Record<string, unknown>,
+  ): Promise<{ data: unknown }>;
+}
+
+/** Look up an existing file's blob sha, or `undefined` if it doesn't exist yet. */
+async function getFileSha(
+  octokit: OctokitLike,
+  owner: string,
+  repo: string,
+  path: string,
+): Promise<string | undefined> {
+  try {
+    const res = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+      owner,
+      repo,
+      path,
+    });
+    // A file returns an object carrying `sha`; a directory returns an array.
+    const data = res.data as { sha?: string } | unknown[];
+    return Array.isArray(data) ? undefined : data.sha;
+  } catch (err) {
+    if ((err as { status?: number }).status === 404) return undefined;
+    throw err;
+  }
+}
+
+/**
+ * Commit the files for one problem under `<slug>/` in the user's repo, using the
+ * provided octokit client. Each file is upserted: on an existing path we pass its
+ * blob `sha` so the Contents API updates instead of rejecting with 422.
+ */
+export async function commitFilesWith(
+  octokit: OctokitLike,
+  params: CommitFilesParams,
+): Promise<void> {
   for (const file of params.files) {
+    const path = `${params.slug}/${file.path}`;
+    const sha = await getFileSha(octokit, params.owner, params.repo, path);
     await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
       owner: params.owner,
       repo: params.repo,
-      path: `${params.slug}/${file.path}`,
+      path,
       message: params.message,
       content: Buffer.from(file.content, "utf8").toString("base64"),
+      ...(sha ? { sha } : {}),
     });
   }
+}
+
+/** Commit a problem's files to the user's repo via their GitHub App installation. */
+export async function commitFiles(params: CommitFilesParams): Promise<void> {
+  const octokit = (await getInstallationOctokit(params.installationId)) as OctokitLike;
+  await commitFilesWith(octokit, params);
 }
 
 /** Build the GitHub files (question.md, solution.<ext>, meta.json) for a capture. */
