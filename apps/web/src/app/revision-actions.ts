@@ -11,11 +11,14 @@ export async function recordRevisionAttempt(submissionId: string, selfRating: nu
   const session = await auth();
   if (!session?.userId) return;
   const token = await mintScsToken(session.userId);
-  await fetch(`${apiBase()}/revisions`, {
+  const res = await fetch(`${apiBase()}/revisions`, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
     body: JSON.stringify({ submissionId, selfRating }),
   });
+  if (!res.ok) {
+    throw new Error(`Failed to record revision attempt (${res.status})`);
+  }
   revalidatePath("/");
 }
 
@@ -24,11 +27,14 @@ export async function setRevisionFlag(submissionId: string, isMarkedForRevision:
   const session = await auth();
   if (!session?.userId) return;
   const token = await mintScsToken(session.userId);
-  await fetch(`${apiBase()}/submissions/${submissionId}/revision-flag`, {
+  const res = await fetch(`${apiBase()}/submissions/${submissionId}/revision-flag`, {
     method: "PATCH",
     headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
     body: JSON.stringify({ isMarkedForRevision }),
   });
+  if (!res.ok) {
+    throw new Error(`Failed to update revision flag (${res.status})`);
+  }
   revalidatePath("/problems");
   revalidatePath("/");
 }

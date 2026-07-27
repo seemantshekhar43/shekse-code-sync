@@ -13,6 +13,7 @@ const ratings: { label: string; value: number }[] = [
 
 export function RevisionQueueRail({ items }: { items: RevisionQueueItem[] }) {
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [errorId, setErrorId] = useState<string | null>(null);
 
   if (items.length === 0) {
     return <p className="text-[12.5px] italic text-faint">Nothing due for revision right now.</p>;
@@ -20,8 +21,14 @@ export function RevisionQueueRail({ items }: { items: RevisionQueueItem[] }) {
 
   async function rate(submissionId: string, selfRating: number) {
     setPendingId(submissionId);
-    await recordRevisionAttempt(submissionId, selfRating);
-    setPendingId(null);
+    setErrorId(null);
+    try {
+      await recordRevisionAttempt(submissionId, selfRating);
+    } catch {
+      setErrorId(submissionId);
+    } finally {
+      setPendingId(null);
+    }
   }
 
   return (
@@ -33,6 +40,9 @@ export function RevisionQueueRail({ items }: { items: RevisionQueueItem[] }) {
         >
           <div className="mb-1 text-[13.5px] font-semibold">{item.title}</div>
           <div className="mb-2.5 text-[11.5px] text-muted">{item.pattern ?? "Uncategorized"}</div>
+          {errorId === item.submissionId && (
+            <p className="mb-2 text-[11.5px] text-red-500">Couldn&apos;t save your rating. Try again.</p>
+          )}
           <div className="flex gap-1.5">
             {ratings.map((r) => (
               <button
