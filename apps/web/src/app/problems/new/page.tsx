@@ -1,4 +1,5 @@
 import { auth } from "../../../auth";
+import { getHeaderData } from "../../../lib/header-data";
 import { DashboardHeader } from "../../DashboardHeader";
 import { AddProblemForm } from "./AddProblemForm";
 
@@ -15,12 +16,12 @@ export default async function AddProblemPage() {
     );
   }
 
-  const displayName = session.user?.name ?? session.githubLogin ?? "You";
+  const headerData = await getHeaderData(session);
 
   return (
     <main className="mx-auto max-w-3xl px-8 py-12">
       <div className="rounded-shell border border-border bg-paper shadow-shell">
-        <DashboardHeader active="/problems" displayName={displayName} />
+        <DashboardHeader active="/problems" {...headerData} />
 
         <div className="px-6 pb-1 pt-8">
           <div className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">

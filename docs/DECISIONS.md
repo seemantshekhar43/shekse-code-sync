@@ -93,3 +93,15 @@ Designed in a lavish session, then implemented, delivering the manual capture pa
 | 38 | Manual-entry language select defaults to Java | `apps/web/src/app/problems/new/AddProblemForm.tsx` | Reviewer feedback in the lavish session |
 | 39 | Code view (submission page) and code entry (new-problem form) share one CodeMirror 6 component | Added `apps/web/src/app/CodeEditor.tsx`; the read-only `CodeViewer` and the editable `AddProblemForm` both render it, replacing the plain `<pre>` from decision #34 | Reviewer feedback in the lavish session; keeps syntax highlighting and styling in one place instead of duplicating a code surface |
 | 40 | Editor background is `#1b1b1b` | Changed from an initial `#1e1c19` in `CodeEditor.tsx`'s theme | Reviewer feedback: better text contrast |
+
+## 2026-07-27 - Avatar/profile menu (issue #43)
+
+Designed in a lavish session (`.lavish/avatar-profile-menu.html`) against a dark generic-SaaS reference screenshot the user shared, then implemented.
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 41 | Reference screenshot's content, not its skin | Kept what to include (account info, GitHub repo status, extension token, sign out) from the reference; rejected its dark theme/settings-page look in favor of our locked axi.md system | Design tokens are locked (docs/DESIGN.md); the reference was functional inspiration only |
+| 42 | Avatar opens a dropdown, not a dedicated settings page | `AvatarMenu.tsx`, a client component anchored under the avatar | User confirmed in review: ship the lighter dropdown now, revisit a full `/settings` page later if needed |
+| 43 | The two standalone "GitHub repo" / "Extension token" cards are removed from the homepage | Folded into the dropdown instead; `TokenField.tsx` deleted as no longer used | User confirmed in review - avoids duplicating the same status/actions in two places |
+| 44 | GitHub "Disconnect" action deferred | Filed as a separate issue (#47), not built now | Reference screenshot had a danger-zone disconnect but no backend support exists yet; user asked for it as a follow-up |
+| 45 | Header data (token, GitHub repo status, install URL) centralized in `getHeaderData()` | New `apps/web/src/lib/header-data.ts`, used by all four pages that render `DashboardHeader` | Avoids duplicating the same session/Prisma/JWT lookups across the overview, problems, add-problem, and code-view pages |

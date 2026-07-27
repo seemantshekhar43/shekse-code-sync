@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { auth } from "../../../../auth";
-import { mintScsToken } from "../../../../lib/scs-token";
+import { getHeaderData } from "../../../../lib/header-data";
 import { getSubmissionCode } from "../../../../lib/submissions-api";
 import { DashboardHeader } from "../../../DashboardHeader";
 import { CodeViewer } from "./CodeViewer";
@@ -19,16 +19,14 @@ export default async function SubmissionCodePage({ params }: { params: { id: str
     );
   }
 
-  const token = await mintScsToken(session.userId);
-  const result = await getSubmissionCode(token, params.id);
+  const headerData = await getHeaderData(session);
+  const result = await getSubmissionCode(headerData.token, params.id);
   if (!result) notFound();
-
-  const displayName = session.user?.name ?? session.githubLogin ?? "You";
 
   return (
     <main className="mx-auto max-w-5xl px-8 py-12">
       <div className="rounded-shell border border-border bg-paper shadow-shell">
-        <DashboardHeader active="/problems" displayName={displayName} />
+        <DashboardHeader active="/problems" {...headerData} />
         <div className="flex items-center justify-between px-6 pb-1 pt-6">
           <div>
             <a href="/problems" className="text-xs font-medium text-muted hover:text-green">

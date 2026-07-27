@@ -1,10 +1,8 @@
-import { prisma } from "@scs/db";
 import { auth, signIn } from "../auth";
+import { getHeaderData } from "../lib/header-data";
 import { pillClass, relativeSolved, safeHttpUrl } from "../lib/dashboard-format";
-import { mintInstallState, mintScsToken } from "../lib/scs-token";
 import { getSubmissions } from "../lib/submissions-api";
 import { DashboardHeader } from "./DashboardHeader";
-import { TokenField } from "./TokenField";
 
 const installBanner: Record<string, { text: string; ok: boolean }> = {
   connected: { text: "GitHub repo connected. Captures will commit there.", ok: true },
@@ -75,19 +73,8 @@ export default async function HomePage({
     );
   }
 
-  const token = await mintScsToken(session.userId);
-  const [submissions, user] = await Promise.all([
-    getSubmissions(token),
-    prisma.user.findUnique({
-      where: { id: session.userId },
-      select: { githubRepo: true },
-    }),
-  ]);
-  const appSlug = process.env.NEXT_PUBLIC_GITHUB_APP_SLUG;
-  const installState = await mintInstallState(session.userId);
-  const installUrl = appSlug
-    ? `https://github.com/apps/${appSlug}/installations/new?state=${encodeURIComponent(installState)}`
-    : undefined;
+  const headerData = await getHeaderData(session);
+  const submissions = await getSubmissions(headerData.token);
   const banner = searchParams.github ? installBanner[searchParams.github] : undefined;
 
   const patterns = new Set(submissions.map((s) => s.pattern).filter(Boolean));
@@ -96,7 +83,6 @@ export default async function HomePage({
   const recent = [...submissions]
     .sort((a, b) => b.solvedAt.getTime() - a.solvedAt.getTime())
     .slice(0, 8);
-  const displayName = session.user?.name ?? session.githubLogin ?? "You";
   const today = new Date().toLocaleDateString(undefined, {
     weekday: "long",
     month: "long",
@@ -106,9 +92,20 @@ export default async function HomePage({
   return (
     <main className="mx-auto max-w-5xl px-8 py-12">
       <div className="rounded-shell border border-border bg-paper shadow-shell">
-        <DashboardHeader active="/" displayName={displayName} />
+        <DashboardHeader active="/" {...headerData} />
 
         <div className="px-6 pb-1 pt-8">
+          {banner ? (
+            <p
+              className={`mb-4 rounded-card border px-3 py-2 text-sm ${
+                banner.ok
+                  ? "border-green-soft bg-green-soft text-green"
+                  : "border-hard/20 bg-hard/10 text-hard"
+              }`}
+            >
+              {banner.text}
+            </p>
+          ) : null}
           <div className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">
             {today}
           </div>
@@ -247,62 +244,6 @@ export default async function HomePage({
           </div>
         </div>
       </div>
-
-      <section className="mt-6 rounded-card border border-border bg-surface px-5 py-4">
-        <h3 className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">
-          GitHub repo
-        </h3>
-        {banner ? (
-          <p
-            className={`mt-2 rounded-card border px-3 py-2 text-sm ${
-              banner.ok
-                ? "border-green-soft bg-green-soft text-green"
-                : "border-hard/20 bg-hard/10 text-hard"
-            }`}
-          >
-            {banner.text}
-          </p>
-        ) : null}
-        {user?.githubRepo ? (
-          <p className="mt-1.5 text-xs text-muted">
-            Syncing to <span className="font-mono text-ink">{user.githubRepo}</span>.{" "}
-            {installUrl ? (
-              <a href={installUrl} className="text-green underline">
-                Manage
-              </a>
-            ) : null}
-          </p>
-        ) : (
-          <div className="mt-1.5">
-            <p className="text-xs text-muted">
-              Install the ShekseCodeSync GitHub App on the repo you want your solutions
-              committed to.
-            </p>
-            {installUrl ? (
-              <a
-                href={installUrl}
-                className="mt-2 inline-block rounded-btn bg-green px-3 py-1.5 text-xs font-semibold text-white"
-              >
-                Connect GitHub repo
-              </a>
-            ) : (
-              <p className="mt-2 text-xs text-medium">
-                Set NEXT_PUBLIC_GITHUB_APP_SLUG to enable one-click install.
-              </p>
-            )}
-          </div>
-        )}
-      </section>
-
-      <section className="mt-4 rounded-card border border-border bg-surface px-5 py-4">
-        <h3 className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">
-          Extension token
-        </h3>
-        <p className="mt-1.5 text-xs text-muted">
-          Paste this into the ShekseCodeSync extension to sync captures to your account.
-        </p>
-        <TokenField token={token} />
-      </section>
     </main>
   );
 }
