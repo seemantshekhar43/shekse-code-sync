@@ -117,3 +117,13 @@ Built the SRS half of the `RevisionAttempt` model that already existed on paper:
 | 48 | Revision-flag toggle added to Problems screen | New `PATCH /submissions/:id/revision-flag`, a "Mark"/"Marked" button per row | Discovered while implementing #31 that nothing set `isMarkedForRevision` anywhere - it defaults `false` and the revision queue would always be empty without a way to flag a submission |
 | 49 | Rating UI lives on the Overview rail, not a dedicated screen | `RevisionQueueRail.tsx` client component with Again/Hard/Good/Easy buttons calling `POST /revisions` | #31's acceptance criterion is "a user can rate a revision" - since the dedicated Revision screen is #41's job, the rating action needed a temporary home to make the feature end-to-end usable now |
 | 50 | AI Insight card copy updated | Now points at the dedicated Insights screen (#42) instead of "the revision engine" | The revision engine has shipped but real insights-aggregation is still #42's explicit scope, not #31's |
+
+## 2026-07-28 - Dedicated Revision screen (issue #41)
+
+Built the `/revision` screen signed off in lavish (`.lavish/revision-screen.html`), segmenting the full revision queue into Due now / Due soon (next 3 days) / Upcoming.
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 51 | New `RevisionsService.fullQueue()` + `GET /revisions/full-queue` | Returns every `isMarkedForRevision` submission regardless of due date; `apps/web/src/lib/revision-segments.ts` segments client-side | `GET /revisions/queue` only ever returns overdue-or-never-rated items (needed as-is by the Overview rail); the dedicated screen needs the full set to show due-soon and upcoming buckets too |
+| 52 | Added "Remove from queue" action per card/row | Reuses the existing `PATCH /submissions/:id/revision-flag` endpoint - the same one the Problems screen "Mark"/"Marked" toggle calls | SM-2 never drops an item out of the queue on its own, it just keeps rescheduling `dueAt`; user asked for a way to graduate a problem out and approved reusing the existing flag endpoint instead of adding a new one |
+| 53 | `RevisionQueueItem` extended with `ease`, `intervalDays`, `questionLink` | Added to `packages/types/src/index.ts` | `ease`/`intervalDays` needed for due-soon/upcoming card metadata; `questionLink` makes problem titles link out to LeetCode/NeetCode like the Problems screen, a gap caught after the user asked what clicking a card does |
