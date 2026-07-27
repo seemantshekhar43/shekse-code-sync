@@ -20,6 +20,7 @@ export async function recordRevisionAttempt(submissionId: string, selfRating: nu
     throw new Error(`Failed to record revision attempt (${res.status})`);
   }
   revalidatePath("/");
+  revalidatePath("/revision");
 }
 
 /** Marks or unmarks a submission for revision (Problems screen toggle). */
@@ -37,4 +38,5 @@ export async function setRevisionFlag(submissionId: string, isMarkedForRevision:
   }
   revalidatePath("/problems");
   revalidatePath("/");
+  revalidatePath("/revision");
 }

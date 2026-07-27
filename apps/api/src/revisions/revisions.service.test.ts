@@ -54,6 +54,44 @@ describe("RevisionsService.queue", () => {
   });
 });
 
+describe("RevisionsService.fullQueue", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("includes marked submissions regardless of due date, sorted soonest-due first", async () => {
+    vi.mocked(prisma.submission.findMany).mockResolvedValue([
+      {
+        id: "not-due-yet",
+        title: "Word Ladder",
+        level: "hard",
+        analysis: { pattern: "bfs" },
+        revisions: [{ dueAt: new Date("2026-08-01T00:00:00.000Z"), ease: 2.6, intervalDays: 8 }],
+      },
+      {
+        id: "never-rated",
+        title: "Two Sum",
+        level: "easy",
+        analysis: { pattern: "hash-map" },
+        revisions: [],
+      },
+      {
+        id: "overdue",
+        title: "LRU Cache",
+        level: "medium",
+        analysis: null,
+        revisions: [{ dueAt: new Date("2026-07-26T00:00:00.000Z"), ease: 2.1, intervalDays: 5 }],
+      },
+    ] as never);
+
+    const result = await makeService().fullQueue("user_1");
+
+    expect(result.map((r) => r.submissionId)).toEqual(["never-rated", "overdue", "not-due-yet"]);
+    expect(result.find((r) => r.submissionId === "not-due-yet")).toMatchObject({
+      ease: 2.6,
+      intervalDays: 8,
+    });
+  });
+});
+
 describe("RevisionsService.recordAttempt", () => {
   beforeEach(() => vi.clearAllMocks());
 

@@ -119,13 +119,17 @@ export const RevisionAttemptResult = z.object({
 });
 export type RevisionAttemptResult = z.infer<typeof RevisionAttemptResult>;
 
-/** One item on the revision queue: a marked submission that's currently due. */
+/** One item on the revision queue: a submission marked for revision. */
 export const RevisionQueueItem = z.object({
   submissionId: z.string(),
   title: z.string(),
+  questionLink: z.string(),
   pattern: z.string().nullable(),
   level: Level,
   /** Null means never rated - first attempt is immediately due. */
   dueAt: z.coerce.date().nullable(),
+  /** SM-2 state from the latest attempt; null when never rated. */
+  ease: z.number().nullable(),
+  intervalDays: z.number().int().nullable(),
 });
 export type RevisionQueueItem = z.infer<typeof RevisionQueueItem>;

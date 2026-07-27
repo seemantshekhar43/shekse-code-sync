@@ -13,6 +13,11 @@ export class RevisionsController {
     return this.revisions.queue(userId);
   }
 
+  @Get("full-queue")
+  async fullQueue(@CurrentUserId() userId: string): Promise<RevisionQueueItem[]> {
+    return this.revisions.fullQueue(userId);
+  }
+
   @Post()
   async record(
     @CurrentUserId() userId: string,
