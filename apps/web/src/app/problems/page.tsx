@@ -1,6 +1,6 @@
 import { auth } from "../../auth";
 import { pillClass, relativeSolved, safeHttpUrl } from "../../lib/dashboard-format";
-import { mintScsToken } from "../../lib/scs-token";
+import { getHeaderData } from "../../lib/header-data";
 import { getSubmissions } from "../../lib/submissions-api";
 import { DashboardHeader } from "../DashboardHeader";
 import { FilterBar } from "./FilterBar";
@@ -26,10 +26,10 @@ export default async function ProblemsPage({
     );
   }
 
-  const token = await mintScsToken(session.userId);
+  const headerData = await getHeaderData(session);
   const [all, filtered] = await Promise.all([
-    getSubmissions(token),
-    getSubmissions(token, {
+    getSubmissions(headerData.token),
+    getSubmissions(headerData.token, {
       platform: searchParams.platform,
       level: searchParams.level,
       pattern: searchParams.pattern,
@@ -74,12 +74,10 @@ export default async function ProblemsPage({
 
   const sortColumns: Record<string, "title" | "solvedAt"> = { Problem: "title", Solved: "solvedAt" };
 
-  const displayName = session.user?.name ?? session.githubLogin ?? "You";
-
   return (
     <main className="mx-auto max-w-5xl px-8 py-12">
       <div className="rounded-shell border border-border bg-paper shadow-shell">
-        <DashboardHeader active="/problems" displayName={displayName} />
+        <DashboardHeader active="/problems" {...headerData} />
 
         <div className="flex items-end justify-between gap-4 px-6 pb-1 pt-8">
           <div>

@@ -1,5 +1,5 @@
 import { signOut } from "../auth";
-import { initials } from "../lib/dashboard-format";
+import { AvatarMenu } from "./AvatarMenu";
 
 const navItems = [
   { href: "/", label: "Overview" },
@@ -11,9 +11,19 @@ const navItems = [
 export function DashboardHeader({
   active,
   displayName,
+  githubHandle,
+  githubRepo,
+  manageUrl,
+  connectUrl,
+  token,
 }: {
   active: (typeof navItems)[number]["href"];
   displayName: string;
+  githubHandle: string | null;
+  githubRepo: string | null;
+  manageUrl?: string;
+  connectUrl?: string;
+  token: string;
 }) {
   return (
     <div className="flex items-center justify-between border-b border-border px-6 py-3.5">
@@ -34,20 +44,18 @@ export function DashboardHeader({
           ))}
         </nav>
       </div>
-      <form
-        action={async () => {
+      <AvatarMenu
+        displayName={displayName}
+        githubHandle={githubHandle}
+        githubRepo={githubRepo}
+        manageUrl={manageUrl}
+        connectUrl={connectUrl}
+        token={token}
+        signOutAction={async () => {
           "use server";
           await signOut();
         }}
-      >
-        <button
-          type="submit"
-          title={`Sign out${displayName ? ` (${displayName})` : ""}`}
-          className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-green text-xs font-semibold text-white"
-        >
-          {initials(displayName)}
-        </button>
-      </form>
+      />
     </div>
   );
 }
