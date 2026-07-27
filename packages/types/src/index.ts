@@ -93,3 +93,39 @@ export const Analysis = z.object({
   optimizationNotes: z.string(),
 });
 export type Analysis = z.infer<typeof Analysis>;
+
+/** Toggle a submission's revision flag (Problems screen mark/unmark action). */
+export const SetRevisionFlag = z.object({
+  isMarkedForRevision: z.boolean(),
+});
+export type SetRevisionFlag = z.infer<typeof SetRevisionFlag>;
+
+/** Self-graded recall quality for a revision attempt, Anki/SM-2 style: 0 = blackout, 5 = perfect. */
+export const RevisionRating = z.number().int().min(0).max(5);
+export type RevisionRating = z.infer<typeof RevisionRating>;
+
+/** Body for `POST /revisions` - record a rated revision attempt. */
+export const RecordRevisionAttempt = z.object({
+  submissionId: z.string(),
+  selfRating: RevisionRating,
+});
+export type RecordRevisionAttempt = z.infer<typeof RecordRevisionAttempt>;
+
+/** The SRS state produced by rating a revision attempt. */
+export const RevisionAttemptResult = z.object({
+  ease: z.number(),
+  intervalDays: z.number().int(),
+  dueAt: z.coerce.date(),
+});
+export type RevisionAttemptResult = z.infer<typeof RevisionAttemptResult>;
+
+/** One item on the revision queue: a marked submission that's currently due. */
+export const RevisionQueueItem = z.object({
+  submissionId: z.string(),
+  title: z.string(),
+  pattern: z.string().nullable(),
+  level: Level,
+  /** Null means never rated - first attempt is immediately due. */
+  dueAt: z.coerce.date().nullable(),
+});
+export type RevisionQueueItem = z.infer<typeof RevisionQueueItem>;

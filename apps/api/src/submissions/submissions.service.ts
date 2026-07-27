@@ -82,6 +82,17 @@ export class SubmissionsService {
     return { language: submission.language, code, analysis: submission.analysis };
   }
 
+  /** Toggles the revision flag for a submission the user owns. */
+  async setRevisionFlag(userId: string, submissionId: string, isMarkedForRevision: boolean): Promise<void> {
+    const { count } = await prisma.submission.updateMany({
+      where: { id: submissionId, userId },
+      data: { isMarkedForRevision },
+    });
+    if (count === 0) {
+      throw new NotFoundException("Submission not found");
+    }
+  }
+
   /**
    * Capture flow: commit the problem to the user's GitHub repo (source of
    * truth), write the metadata index row, then enqueue AI enrichment and return

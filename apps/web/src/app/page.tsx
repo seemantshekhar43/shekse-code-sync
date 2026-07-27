@@ -1,8 +1,10 @@
 import { auth, signIn } from "../auth";
 import { getHeaderData } from "../lib/header-data";
 import { pillClass, relativeSolved, safeHttpUrl } from "../lib/dashboard-format";
+import { getRevisionQueue } from "../lib/revisions-api";
 import { getSubmissions } from "../lib/submissions-api";
 import { DashboardHeader } from "./DashboardHeader";
+import { RevisionQueueRail } from "./RevisionQueueRail";
 
 const installBanner: Record<string, { text: string; ok: boolean }> = {
   connected: { text: "GitHub repo connected. Captures will commit there.", ok: true },
@@ -74,11 +76,13 @@ export default async function HomePage({
   }
 
   const headerData = await getHeaderData(session);
-  const submissions = await getSubmissions(headerData.token);
+  const [submissions, revisionQueue] = await Promise.all([
+    getSubmissions(headerData.token),
+    getRevisionQueue(headerData.token),
+  ]);
   const banner = searchParams.github ? installBanner[searchParams.github] : undefined;
 
   const patterns = new Set(submissions.map((s) => s.pattern).filter(Boolean));
-  const dueForRevision = submissions.filter((s) => s.isMarkedForRevision);
   const streak = computeStreak(submissions.map((s) => s.solvedAt));
   const recent = [...submissions]
     .sort((a, b) => b.solvedAt.getTime() - a.solvedAt.getTime())
@@ -111,7 +115,7 @@ export default async function HomePage({
           </div>
           <h2 className="mb-5 font-serif text-[28px] font-semibold leading-tight">
             You&apos;ve solved <span className="text-green">{submissions.length} problems</span>
-            {dueForRevision.length > 0 ? `, and ${dueForRevision.length} are due for revision.` : "."}
+            {revisionQueue.length > 0 ? `, and ${revisionQueue.length} are due for revision.` : "."}
           </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div className="rounded-card border border-border bg-surface px-4 py-4">
@@ -138,7 +142,7 @@ export default async function HomePage({
             </div>
             <div className="rounded-card border border-border bg-surface px-4 py-4">
               <div className="font-serif text-3xl font-semibold leading-none text-medium">
-                {dueForRevision.length}
+                {revisionQueue.length}
               </div>
               <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
                 Due today
@@ -219,26 +223,13 @@ export default async function HomePage({
             <div className="mb-3">
               <h3 className="font-serif text-lg font-semibold">Revision queue</h3>
             </div>
-            {dueForRevision.length === 0 ? (
-              <p className="text-[12.5px] italic text-faint">Nothing marked for revision yet.</p>
-            ) : (
-              dueForRevision.slice(0, 5).map((s) => (
-                <div
-                  key={s.id}
-                  className="mb-3 rounded-card border border-border bg-surface px-4 py-3.5 last:mb-0"
-                >
-                  <div className="mb-1 text-[13.5px] font-semibold">{s.title}</div>
-                  <div className="text-[11.5px] text-muted">{s.pattern ?? "Uncategorized"}</div>
-                </div>
-              ))
-            )}
+            <RevisionQueueRail items={revisionQueue} />
             <div className="mt-4 rounded-card border border-green-soft bg-green-soft px-4 py-3.5">
               <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-green">
                 AI Insight
               </div>
               <p className="text-[13px] leading-relaxed text-ink">
-                Insights land here once the revision engine ships (see the backlog for the SRS +
-                insights work).
+                Insights land here once the dedicated Insights screen ships (see the backlog).
               </p>
             </div>
           </div>
