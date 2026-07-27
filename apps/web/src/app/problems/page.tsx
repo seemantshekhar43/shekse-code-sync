@@ -81,17 +81,25 @@ export default async function ProblemsPage({
       <div className="rounded-shell border border-border bg-paper shadow-shell">
         <DashboardHeader active="/problems" displayName={displayName} />
 
-        <div className="px-6 pb-1 pt-8">
-          <div className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">
-            All submissions
+        <div className="flex items-end justify-between gap-4 px-6 pb-1 pt-8">
+          <div>
+            <div className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">
+              All submissions
+            </div>
+            <h1 className="mb-1 font-serif text-[26px] font-semibold leading-tight">
+              Every problem you&apos;ve <span className="text-green">solved and synced</span>.
+            </h1>
+            <div className="text-[12px] font-medium text-muted">
+              {all.length} submissions
+              {pendingSync > 0 ? ` · ${pendingSync} pending GitHub sync` : ""}
+            </div>
           </div>
-          <h1 className="mb-1 font-serif text-[26px] font-semibold leading-tight">
-            Every problem you&apos;ve <span className="text-green">solved and synced</span>.
-          </h1>
-          <div className="text-[12px] font-medium text-muted">
-            {all.length} submissions
-            {pendingSync > 0 ? ` · ${pendingSync} pending GitHub sync` : ""}
-          </div>
+          <a
+            href="/problems/new"
+            className="rounded-btn bg-green px-4 py-2.5 text-[13px] font-semibold text-white"
+          >
+            Add problem
+          </a>
         </div>
 
         <FilterBar patterns={patterns} languages={languages} />
