@@ -127,3 +127,14 @@ Built the `/revision` screen signed off in lavish (`.lavish/revision-screen.html
 | 51 | New `RevisionsService.fullQueue()` + `GET /revisions/full-queue` | Returns every `isMarkedForRevision` submission regardless of due date; `apps/web/src/lib/revision-segments.ts` segments client-side | `GET /revisions/queue` only ever returns overdue-or-never-rated items (needed as-is by the Overview rail); the dedicated screen needs the full set to show due-soon and upcoming buckets too |
 | 52 | Added "Remove from queue" action per card/row | Reuses the existing `PATCH /submissions/:id/revision-flag` endpoint - the same one the Problems screen "Mark"/"Marked" toggle calls | SM-2 never drops an item out of the queue on its own, it just keeps rescheduling `dueAt`; user asked for a way to graduate a problem out and approved reusing the existing flag endpoint instead of adding a new one |
 | 53 | `RevisionQueueItem` extended with `ease`, `intervalDays`, `questionLink` | Added to `packages/types/src/index.ts` | `ease`/`intervalDays` needed for due-soon/upcoming card metadata; `questionLink` makes problem titles link out to LeetCode/NeetCode like the Problems screen, a gap caught after the user asked what clicking a card does |
+
+## 2026-07-28 - Dedicated Insights screen (issue #42)
+
+Built the `/insights` screen signed off in lavish (`.lavish/insights-screen.html`); the design changed shape mid-review based on live user feedback.
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 54 | Full-year calendar heatmap instead of a weekly trend chart | `CalendarHeatmap.tsx` - GitHub-style grid with month/weekday labels, sequential single-hue green ramp, click-to-drill-down panel (title + difficulty per day) | Initial line/area proposal was rejected live; user pasted a GitHub contribution-calendar reference and asked for that form instead, plus drill-down beyond a hover tooltip |
+| 55 | Difficulty mix stays a bar chart with direct text labels, not a pie/donut | Ran the locked green/amber/red difficulty palette through the dataviz skill's colorblind validator - came back borderline (red/amber normal-vision floor just under threshold) | A donut is the wrong form for comparing close values regardless; bar + labels mitigates the borderline contrast without touching the locked tokens (docs/DESIGN.md) |
+| 56 | AI-insight bullets are rule-based, not LLM-generated, for this issue | `apps/web/src/lib/insights-observations.ts`; LLM-generated version filed as a follow-up (#51, needs a caching strategy to avoid a live model call per page view) | User was asked directly and chose rule-based now to keep #42 scoped and avoid the caching problem |
+| 57 | Streaks computed over all-time data, independent of the viewed `?year=` | `InsightsService` in `apps/api/src/insights/insights.service.ts` | A streak that reset at a year boundary would misrepresent an actual ongoing streak spanning New Year's |
