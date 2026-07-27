@@ -21,9 +21,9 @@ function languageExtension(language: string) {
 
 const theme = EditorView.theme(
   {
-    "&": { backgroundColor: "#1e1c19", color: "#e8e3d9", fontSize: "12.5px" },
+    "&": { backgroundColor: "#1b1b1b", color: "#e8e3d9", fontSize: "12.5px" },
     ".cm-content": { fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", padding: "14px 0" },
-    ".cm-gutters": { backgroundColor: "#1e1c19", color: "#7d766c", border: "none" },
+    ".cm-gutters": { backgroundColor: "#1b1b1b", color: "#7d766c", border: "none" },
     ".cm-activeLine": { backgroundColor: "rgba(255,255,255,0.03)" },
     ".cm-activeLineGutter": { backgroundColor: "rgba(255,255,255,0.03)" },
     "&.cm-focused": { outline: "none" },
