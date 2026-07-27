@@ -59,9 +59,28 @@ export const SubmissionSummary = z.object({
   isMarkedForRevision: z.boolean(),
   enrichment: EnrichmentStatus,
   pattern: z.string().nullable(),
+  /** Whether the problem's files have actually been committed to the user's GitHub repo. */
+  synced: z.boolean(),
   solvedAt: z.coerce.date(),
 });
 export type SubmissionSummary = z.infer<typeof SubmissionSummary>;
+
+/** Sortable columns on the Problems screen. */
+export const SubmissionSortBy = z.enum(["title", "solvedAt"]);
+export type SubmissionSortBy = z.infer<typeof SubmissionSortBy>;
+
+/** Query params for filtering/sorting `GET /submissions`. All optional; an absent query returns everything, newest first, for backward compatibility with the overview. */
+export const SubmissionQuery = z.object({
+  platform: Platform.optional(),
+  level: Level.optional(),
+  pattern: z.string().optional(),
+  language: z.string().optional(),
+  synced: z.coerce.boolean().optional(),
+  q: z.string().optional(),
+  sortBy: SubmissionSortBy.default("solvedAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+});
+export type SubmissionQuery = z.infer<typeof SubmissionQuery>;
 
 /** AI-derived enrichment produced by the worker. */
 export const Analysis = z.object({

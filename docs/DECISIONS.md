@@ -70,3 +70,15 @@ Implemented the axi.md design tokens from `docs/DESIGN.md` and the signed-off `d
 | 29 | Token delivery | Palette/typography/radius/shadow encoded as CSS variables (`globals.css`) plus `tailwind.config.ts` theme extensions | Hardcoding the mockup's utility classes - would drift from the locked tokens and block reuse in the plugin popup |
 | 30 | Dashboard data | Stats row and revision queue derived from real `SubmissionSummary` fields (`isMarkedForRevision`, `pattern`, `solvedAt`); the AI Insight card states insights land once the SRS revision engine (issue #31) ships | Fabricating placeholder numbers to match the mockup - would misrepresent product state |
 | 31 | Non-mockup sections | Existing GitHub-connect banner and extension-token sections (not in the mockup) kept and restyled with the same tokens below the redesigned shell | Dropping them to match the mockup exactly - both are still-needed, shipped features |
+
+## 2026-07-27 - Problems screen: sync status, capture status, code view (issue #40)
+
+Designed the Problems screen in a lavish session (`.lavish/problems-screen.html`) and signed off, then implemented it in `apps/web`.
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 32 | Sync status is a real field, not cosmetic | `Submission.repoPath` is only set when the GitHub commit actually succeeds; `SubmissionSummary.synced = repoPath !== null`. Previously `repoPath` was always set to the slug even when the repo write was skipped (no installation wired), which would have made "Synced" lie | Discovered while implementing the mockup's Sync column - an honest per-row signal requires fixing the underlying bug, not just displaying whatever was there |
+| 33 | No Status (accepted/wrong/tle) column | Dropped from the design | Confirmed in `apps/extension/lib/leetcode.ts` that capture only ever sends `status: "accepted"` for `statusDisplay === "Accepted"` submissions - every row is already accepted, so the column had nothing to show |
+| 34 | Code view is read-only, fetched from GitHub | New `GET /submissions/:id/code` reads back `solution.<ext>` via the existing `readSubmissionFiles` helper and renders it in a plain `<pre>` (no editor library added) | GitHub stays the source of truth; view-only avoids introducing a second place solutions can be edited |
+| 35 | Filtering/sorting server-side, pagination client-side over the filtered set | `GET /submissions` gained optional `platform/level/pattern/language/synced/q/sortBy/sortOrder` query params, still returning a plain array (unpaginated); the Problems page slices it into pages of 25 | Keeps the overview's unfiltered full-list fetch (streak/pattern stats) working unchanged; avoids a dual response-shape endpoint for what is, per user, a modest dataset |
+| 36 | Manual "Add problem" entry deferred | Filed as a separate issue (#44), not folded into #40 | User asked for it mid-review; it's a capture path (PRD's manual-form fallback), not a Problems-screen read/filter concern, and needs entry points on both Overview and Problems |

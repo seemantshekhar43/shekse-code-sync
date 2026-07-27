@@ -20,6 +20,7 @@ export interface SubmissionRow {
   topics: string[];
   isMarkedForRevision: boolean;
   enrichment: EnrichmentStatus;
+  repoPath: string | null;
   solvedAt: Date;
   analysis: { pattern: string } | null;
 }
@@ -40,6 +41,7 @@ export function toSummary(row: SubmissionRow): SubmissionSummary {
     isMarkedForRevision: row.isMarkedForRevision,
     enrichment: row.enrichment,
     pattern: row.analysis?.pattern ?? null,
+    synced: row.repoPath !== null,
     solvedAt: row.solvedAt,
   };
 }

@@ -1,7 +1,9 @@
 import { prisma } from "@scs/db";
-import { type SubmissionSummary, SubmissionSummary as SummarySchema } from "@scs/types";
-import { auth, signIn, signOut } from "../auth";
+import { auth, signIn } from "../auth";
+import { pillClass, relativeSolved, safeHttpUrl } from "../lib/dashboard-format";
 import { mintInstallState, mintScsToken } from "../lib/scs-token";
+import { getSubmissions } from "../lib/submissions-api";
+import { DashboardHeader } from "./DashboardHeader";
 import { TokenField } from "./TokenField";
 
 const installBanner: Record<string, { text: string; ok: boolean }> = {
@@ -19,50 +21,6 @@ const installBanner: Record<string, { text: string; ok: boolean }> = {
   error: { text: "Couldn't reach GitHub to finish connecting. Please try again.", ok: false },
 };
 
-async function getSubmissions(token: string): Promise<SubmissionSummary[]> {
-  const base = process.env.API_BASE_URL ?? "http://localhost:3001";
-  try {
-    const res = await fetch(`${base}/submissions`, {
-      cache: "no-store",
-      headers: { authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return [];
-    return SummarySchema.array().parse(await res.json());
-  } catch {
-    // API not reachable yet (e.g. during local scaffold) - render empty.
-    return [];
-  }
-}
-
-const pillClass: Record<string, string> = {
-  easy: "text-green bg-green-soft",
-  medium: "text-medium bg-medium/10",
-  hard: "text-hard bg-hard/10",
-};
-
-function safeHttpUrl(link: string): string | null {
-  try {
-    const url = new URL(link);
-    return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
-  } catch {
-    return null;
-  }
-}
-
-/** "2m ago" / "3h ago" / "yesterday" / locale date, matching the mockup's recency labels. */
-function relativeSolved(date: Date): string {
-  const ms = Date.now() - date.getTime();
-  const minutes = Math.floor(ms / 60_000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days === 1) return "yesterday";
-  if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString();
-}
-
 /** Count of consecutive days (ending today or yesterday) with at least one solve. */
 function computeStreak(dates: Date[]): number {
   if (dates.length === 0) return 0;
@@ -78,12 +36,6 @@ function computeStreak(dates: Date[]): number {
     cursor.setDate(cursor.getDate() - 1);
   }
   return streak;
-}
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  const chars = parts.length > 1 ? [parts[0], parts[parts.length - 1]] : [parts[0]];
-  return chars.map((p) => p[0]?.toUpperCase() ?? "").join("");
 }
 
 export default async function HomePage({
@@ -154,34 +106,7 @@ export default async function HomePage({
   return (
     <main className="mx-auto max-w-5xl px-8 py-12">
       <div className="rounded-shell border border-border bg-paper shadow-shell">
-        <div className="flex items-center justify-between border-b border-border px-6 py-3.5">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 font-serif text-base font-semibold">
-              <span className="h-[9px] w-[9px] rounded-full bg-green shadow-[0_0_0_3px_var(--green-soft)]" />
-              ShekseCodeSync
-            </div>
-            <nav className="flex gap-5 text-sm">
-              <span className="font-medium text-ink">Overview</span>
-              <span className="font-medium text-muted">Problems</span>
-              <span className="font-medium text-muted">Revision</span>
-              <span className="font-medium text-muted">Insights</span>
-            </nav>
-          </div>
-          <form
-            action={async () => {
-              "use server";
-              await signOut();
-            }}
-          >
-            <button
-              type="submit"
-              title={`Sign out${displayName ? ` (${displayName})` : ""}`}
-              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-green text-xs font-semibold text-white"
-            >
-              {initials(displayName)}
-            </button>
-          </form>
-        </div>
+        <DashboardHeader active="/" displayName={displayName} />
 
         <div className="px-6 pb-1 pt-8">
           <div className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">

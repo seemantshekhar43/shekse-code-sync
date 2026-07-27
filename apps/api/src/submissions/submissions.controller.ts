@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
-import { CaptureSubmission, type SubmissionSummary } from "@scs/types";
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
+import { CaptureSubmission, SubmissionQuery, type SubmissionSummary } from "@scs/types";
 import { CurrentUserId, ScsAuthGuard } from "../auth/scs-auth.guard.js";
 import { SubmissionsService } from "./submissions.service.js";
 
@@ -9,8 +9,20 @@ export class SubmissionsController {
   constructor(private readonly submissions: SubmissionsService) {}
 
   @Get()
-  async list(@CurrentUserId() userId: string): Promise<SubmissionSummary[]> {
-    return this.submissions.list(userId);
+  async list(
+    @CurrentUserId() userId: string,
+    @Query() query: Record<string, string>,
+  ): Promise<SubmissionSummary[]> {
+    const hasFilters = Object.keys(query).length > 0;
+    return this.submissions.list(userId, hasFilters ? SubmissionQuery.parse(query) : undefined);
+  }
+
+  @Get(":id/code")
+  async code(
+    @CurrentUserId() userId: string,
+    @Param("id") id: string,
+  ): Promise<{ language: string; code: string }> {
+    return this.submissions.getCode(userId, id);
   }
 
   @Post()
