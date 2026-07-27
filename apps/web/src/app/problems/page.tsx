@@ -36,6 +36,8 @@ export default async function ProblemsPage({
       language: searchParams.language,
       synced: searchParams.synced,
       q: searchParams.q,
+      sortBy: searchParams.sortBy,
+      sortOrder: searchParams.sortOrder,
     }),
   ]);
 
@@ -55,6 +57,22 @@ export default async function ProblemsPage({
     params.set("page", String(targetPage));
     return `/problems?${params.toString()}`;
   }
+
+  const currentSortBy = searchParams.sortBy === "title" ? "title" : "solvedAt";
+  const currentSortOrder = searchParams.sortOrder === "asc" ? "asc" : "desc";
+
+  function sortHref(column: "title" | "solvedAt"): string {
+    const params = new URLSearchParams(
+      Object.entries(searchParams).filter(([, v]) => v) as [string, string][],
+    );
+    const nextOrder = currentSortBy === column && currentSortOrder === "asc" ? "desc" : "asc";
+    params.set("sortBy", column);
+    params.set("sortOrder", nextOrder);
+    params.delete("page");
+    return `/problems?${params.toString()}`;
+  }
+
+  const sortColumns: Record<string, "title" | "solvedAt"> = { Problem: "title", Solved: "solvedAt" };
 
   const displayName = session.user?.name ?? session.githubLogin ?? "You";
 
@@ -90,14 +108,30 @@ export default async function ProblemsPage({
               <thead>
                 <tr>
                   {["Problem", "Difficulty", "Pattern", "Language", "Platform", "Sync", "Solved", "Code"].map(
-                    (col) => (
-                      <th
-                        key={col}
-                        className="whitespace-nowrap border-b border-border pb-2.5 pr-3.5 text-left text-[10.5px] font-semibold uppercase tracking-[0.09em] text-faint"
-                      >
-                        {col}
-                      </th>
-                    ),
+                    (col) => {
+                      const sortColumn = sortColumns[col];
+                      const isSorted = sortColumn && currentSortBy === sortColumn;
+                      return (
+                        <th
+                          key={col}
+                          className="whitespace-nowrap border-b border-border pb-2.5 pr-3.5 text-left text-[10.5px] font-semibold uppercase tracking-[0.09em] text-faint"
+                        >
+                          {sortColumn ? (
+                            <a
+                              href={sortHref(sortColumn)}
+                              className={`inline-flex items-center gap-1 hover:text-ink ${isSorted ? "text-ink" : ""}`}
+                            >
+                              {col}
+                              <span className="text-[9px]">
+                                {isSorted ? (currentSortOrder === "asc" ? "↑" : "↓") : "↕"}
+                              </span>
+                            </a>
+                          ) : (
+                            col
+                          )}
+                        </th>
+                      );
+                    },
                   )}
                 </tr>
               </thead>

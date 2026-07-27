@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const FILTER_KEYS = ["platform", "level", "pattern", "language", "synced", "q"] as const;
 
@@ -25,6 +25,11 @@ export function FilterBar({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const [searchValue, setSearchValue] = useState(searchParams.get("q") ?? "");
+
+  useEffect(() => {
+    setSearchValue(searchParams.get("q") ?? "");
+  }, [searchParams]);
 
   function updateParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -35,6 +40,7 @@ export function FilterBar({
   }
 
   function onSearchChange(value: string) {
+    setSearchValue(value);
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     searchTimeout.current = setTimeout(() => updateParam("q", value), 300);
   }
@@ -56,7 +62,7 @@ export function FilterBar({
           <input
             type="text"
             placeholder="Search by title..."
-            defaultValue={searchParams.get("q") ?? ""}
+            value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full bg-transparent text-ink outline-none placeholder:text-muted"
           />
