@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CaptureSubmission } from "./index.js";
+import { CaptureSubmission, SubmissionQuery } from "./index.js";
 
 describe("CaptureSubmission", () => {
   it("parses a valid submission and defaults empty arrays", () => {
@@ -30,5 +30,19 @@ describe("CaptureSubmission", () => {
         solvedAt: new Date(),
       }),
     ).toThrow();
+  });
+});
+
+describe("SubmissionQuery.synced", () => {
+  it('parses the string "false" as boolean false, not truthy coercion', () => {
+    expect(SubmissionQuery.parse({ synced: "false" }).synced).toBe(false);
+  });
+
+  it('parses the string "true" as boolean true', () => {
+    expect(SubmissionQuery.parse({ synced: "true" }).synced).toBe(true);
+  });
+
+  it("rejects any other value", () => {
+    expect(() => SubmissionQuery.parse({ synced: "yes" })).toThrow();
   });
 });
