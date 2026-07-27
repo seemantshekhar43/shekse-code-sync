@@ -25,18 +25,24 @@ export async function getSubmissions(
   }
 }
 
-/** Fetch a submission's captured code, read back from GitHub. Null if unavailable. */
+export interface SubmissionCode {
+  language: string;
+  code: string;
+  analysis: { timeComplexity: string; spaceComplexity: string } | null;
+}
+
+/** Fetch a submission's captured code (+ AI complexity, once enriched), read back from GitHub. Null if unavailable. */
 export async function getSubmissionCode(
   token: string,
   submissionId: string,
-): Promise<{ language: string; code: string } | null> {
+): Promise<SubmissionCode | null> {
   try {
     const res = await fetch(`${apiBase()}/submissions/${submissionId}/code`, {
       cache: "no-store",
       headers: { authorization: `Bearer ${token}` },
     });
     if (!res.ok) return null;
-    return (await res.json()) as { language: string; code: string };
+    return (await res.json()) as SubmissionCode;
   } catch {
     return null;
   }

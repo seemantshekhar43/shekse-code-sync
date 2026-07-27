@@ -75,7 +75,10 @@ export const SubmissionQuery = z.object({
   level: Level.optional(),
   pattern: z.string().optional(),
   language: z.string().optional(),
-  synced: z.coerce.boolean().optional(),
+  synced: z
+    .enum(["true", "false"])
+    .transform((v) => v === "true")
+    .optional(),
   q: z.string().optional(),
   sortBy: SubmissionSortBy.default("solvedAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),

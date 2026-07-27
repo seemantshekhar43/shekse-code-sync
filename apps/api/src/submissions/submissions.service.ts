@@ -40,12 +40,28 @@ export class SubmissionsService {
     return rows.map(toSummary);
   }
 
-  /** Fetch a submission's captured code, read back from GitHub (source of truth). */
-  async getCode(userId: string, submissionId: string): Promise<{ language: string; code: string }> {
+  /**
+   * Fetch a submission's captured code, read back from GitHub (source of
+   * truth), plus the AI-derived complexity for that same submitted solution
+   * (null while enrichment is still pending/failed).
+   */
+  async getCode(
+    userId: string,
+    submissionId: string,
+  ): Promise<{
+    language: string;
+    code: string;
+    analysis: { timeComplexity: string; spaceComplexity: string } | null;
+  }> {
     const [submission, user] = await Promise.all([
       prisma.submission.findFirst({
         where: { id: submissionId, userId },
-        select: { slug: true, language: true, repoPath: true },
+        select: {
+          slug: true,
+          language: true,
+          repoPath: true,
+          analysis: { select: { timeComplexity: true, spaceComplexity: true } },
+        },
       }),
       prisma.user.findUnique({
         where: { id: userId },
@@ -63,7 +79,7 @@ export class SubmissionsService {
       slug: submission.slug,
       language: submission.language,
     });
-    return { language: submission.language, code };
+    return { language: submission.language, code, analysis: submission.analysis };
   }
 
   /**

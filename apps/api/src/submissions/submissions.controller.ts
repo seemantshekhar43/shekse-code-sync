@@ -18,10 +18,7 @@ export class SubmissionsController {
   }
 
   @Get(":id/code")
-  async code(
-    @CurrentUserId() userId: string,
-    @Param("id") id: string,
-  ): Promise<{ language: string; code: string }> {
+  async code(@CurrentUserId() userId: string, @Param("id") id: string) {
     return this.submissions.getCode(userId, id);
   }
 

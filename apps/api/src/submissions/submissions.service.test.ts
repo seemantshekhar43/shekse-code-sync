@@ -115,11 +115,12 @@ describe("SubmissionsService.getCode", () => {
     vi.clearAllMocks();
   });
 
-  it("reads the code back from GitHub when the submission is synced", async () => {
+  it("reads the code back from GitHub when the submission is synced, with no analysis yet", async () => {
     vi.mocked(prisma.submission.findFirst).mockResolvedValue({
       slug: "two-sum",
       language: "python",
       repoPath: "two-sum",
+      analysis: null,
     } as never);
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       githubInstallationId: "42",
@@ -137,7 +138,26 @@ describe("SubmissionsService.getCode", () => {
       slug: "two-sum",
       language: "python",
     });
-    expect(result).toEqual({ language: "python", code: "print(1)" });
+    expect(result).toEqual({ language: "python", code: "print(1)", analysis: null });
+  });
+
+  it("includes the AI-derived complexity for the same submission once enrichment is done", async () => {
+    vi.mocked(prisma.submission.findFirst).mockResolvedValue({
+      slug: "two-sum",
+      language: "python",
+      repoPath: "two-sum",
+      analysis: { timeComplexity: "O(n)", spaceComplexity: "O(n)" },
+    } as never);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      githubInstallationId: "42",
+      githubRepo: "octocat/solutions",
+    } as never);
+    vi.mocked(readSubmissionFiles).mockResolvedValue({ statement: "# Two Sum", code: "print(1)" });
+    const { service } = makeService();
+
+    const result = await service.getCode("demo-user", "sub_1");
+
+    expect(result.analysis).toEqual({ timeComplexity: "O(n)", spaceComplexity: "O(n)" });
   });
 
   it("rejects when the submission hasn't synced to GitHub yet", async () => {

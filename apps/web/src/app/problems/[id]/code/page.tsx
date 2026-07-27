@@ -3,6 +3,7 @@ import { auth } from "../../../../auth";
 import { mintScsToken } from "../../../../lib/scs-token";
 import { getSubmissionCode } from "../../../../lib/submissions-api";
 import { DashboardHeader } from "../../../DashboardHeader";
+import { CopyCodeButton } from "./CopyCodeButton";
 
 export default async function SubmissionCodePage({ params }: { params: { id: string } }) {
   const session = await auth();
@@ -38,7 +39,36 @@ export default async function SubmissionCodePage({ params }: { params: { id: str
             {result.language}
           </span>
         </div>
+
+        {result.analysis ? (
+          <div className="flex gap-3 px-6 pt-4">
+            <div className="rounded-card border border-border bg-surface px-3.5 py-2.5">
+              <div className="text-[10.5px] font-semibold uppercase tracking-[0.09em] text-faint">
+                Time complexity
+              </div>
+              <div className="mt-0.5 font-mono text-[13px] font-semibold text-ink">
+                {result.analysis.timeComplexity}
+              </div>
+            </div>
+            <div className="rounded-card border border-border bg-surface px-3.5 py-2.5">
+              <div className="text-[10.5px] font-semibold uppercase tracking-[0.09em] text-faint">
+                Space complexity
+              </div>
+              <div className="mt-0.5 font-mono text-[13px] font-semibold text-ink">
+                {result.analysis.spaceComplexity}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="px-6 pt-4 text-[11.5px] italic text-faint">
+            AI complexity analysis hasn&apos;t finished yet - check back shortly.
+          </p>
+        )}
+
         <div className="px-6 pb-7 pt-4">
+          <div className="mb-2 flex justify-end">
+            <CopyCodeButton code={result.code} />
+          </div>
           <pre className="overflow-x-auto rounded-card border border-border bg-surface p-4 font-mono text-[12.5px] leading-relaxed text-ink">
             <code>{result.code}</code>
           </pre>
