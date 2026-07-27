@@ -3,6 +3,7 @@ import { pillClass, relativeSolved, safeHttpUrl } from "../../lib/dashboard-form
 import { getHeaderData } from "../../lib/header-data";
 import { getSubmissions } from "../../lib/submissions-api";
 import { DashboardHeader } from "../DashboardHeader";
+import { setRevisionFlag } from "../revision-actions";
 import { FilterBar } from "./FilterBar";
 
 const PAGE_SIZE = 25;
@@ -113,7 +114,7 @@ export default async function ProblemsPage({
             <table className="w-full min-w-[860px] border-collapse">
               <thead>
                 <tr>
-                  {["Problem", "Difficulty", "Pattern", "Language", "Platform", "Sync", "Solved", "Code"].map(
+                  {["Problem", "Difficulty", "Pattern", "Language", "Platform", "Sync", "Solved", "Revise", "Code"].map(
                     (col) => {
                       const sortColumn = sortColumns[col];
                       const isSorted = sortColumn && currentSortBy === sortColumn;
@@ -185,6 +186,20 @@ export default async function ProblemsPage({
                       </td>
                       <td className="whitespace-nowrap border-b border-border py-3 pr-3.5 font-mono text-[11.5px] text-faint">
                         {relativeSolved(s.solvedAt)}
+                      </td>
+                      <td className="border-b border-border py-3 pr-3.5">
+                        <form action={setRevisionFlag.bind(null, s.id, !s.isMarkedForRevision)}>
+                          <button
+                            type="submit"
+                            className={`whitespace-nowrap rounded-md border px-2 py-1 text-[11.5px] font-medium ${
+                              s.isMarkedForRevision
+                                ? "border-green-soft bg-green-soft text-green"
+                                : "border-border bg-surface text-muted hover:border-green hover:text-green"
+                            }`}
+                          >
+                            {s.isMarkedForRevision ? "Marked" : "Mark"}
+                          </button>
+                        </form>
                       </td>
                       <td className="border-b border-border py-3">
                         {s.synced ? (

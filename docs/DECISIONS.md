@@ -105,3 +105,15 @@ Designed in a lavish session (`.lavish/avatar-profile-menu.html`) against a dark
 | 43 | The two standalone "GitHub repo" / "Extension token" cards are removed from the homepage | Folded into the dropdown instead; `TokenField.tsx` deleted as no longer used | User confirmed in review - avoids duplicating the same status/actions in two places |
 | 44 | GitHub "Disconnect" action deferred | Filed as a separate issue (#47), not built now | Reference screenshot had a danger-zone disconnect but no backend support exists yet; user asked for it as a follow-up |
 | 45 | Header data (token, GitHub repo status, install URL) centralized in `getHeaderData()` | New `apps/web/src/lib/header-data.ts`, used by all four pages that render `DashboardHeader` | Avoids duplicating the same session/Prisma/JWT lookups across the overview, problems, add-problem, and code-view pages |
+
+## 2026-07-27 - Revision engine (SRS): scheduler + queue API (issue #31)
+
+Built the SRS half of the `RevisionAttempt` model that already existed on paper: a real scheduler, a way to mark/rate submissions, and the Overview rail wired to actual due dates instead of a raw `isMarkedForRevision` list.
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 46 | Scope boundary vs #41/#42 | Kept #31 to the SRS scheduler, `POST /revisions` + `GET /revisions/queue`, and wiring real due-item data into the existing Overview rail/stat/rating UI - no dedicated Revision or Insights routes | Both #41 and #42 explicitly defer their own lavish-designed screens until #31 ships with real data; building them now would preempt their design sign-off |
+| 47 | Scheduling algorithm | Classic SM-2 (Anki): `apps/api/src/revisions/srs.ts` - quality 0-5, ease floored at 1.3, interval resets to 1 day on quality &lt; 3, otherwise 1 → 6 → `round(prevInterval * ease)` | Matches the PRD's "Anki-style" spaced repetition call-out and the schema's existing `ease`/`intervalDays` fields; a well-known algorithm needs no bespoke tuning |
+| 48 | Revision-flag toggle added to Problems screen | New `PATCH /submissions/:id/revision-flag`, a "Mark"/"Marked" button per row | Discovered while implementing #31 that nothing set `isMarkedForRevision` anywhere - it defaults `false` and the revision queue would always be empty without a way to flag a submission |
+| 49 | Rating UI lives on the Overview rail, not a dedicated screen | `RevisionQueueRail.tsx` client component with Again/Hard/Good/Easy buttons calling `POST /revisions` | #31's acceptance criterion is "a user can rate a revision" - since the dedicated Revision screen is #41's job, the rating action needed a temporary home to make the feature end-to-end usable now |
+| 50 | AI Insight card copy updated | Now points at the dedicated Insights screen (#42) instead of "the revision engine" | The revision engine has shipped but real insights-aggregation is still #42's explicit scope, not #31's |
