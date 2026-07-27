@@ -82,3 +82,14 @@ Designed the Problems screen in a lavish session (`.lavish/problems-screen.html`
 | 34 | Code view is read-only, fetched from GitHub | New `GET /submissions/:id/code` reads back `solution.<ext>` via the existing `readSubmissionFiles` helper and renders it in a plain `<pre>` (no editor library added) | GitHub stays the source of truth; view-only avoids introducing a second place solutions can be edited |
 | 35 | Filtering/sorting server-side, pagination client-side over the filtered set | `GET /submissions` gained optional `platform/level/pattern/language/synced/q/sortBy/sortOrder` query params, still returning a plain array (unpaginated); the Problems page slices it into pages of 25 | Keeps the overview's unfiltered full-list fetch (streak/pattern stats) working unchanged; avoids a dual response-shape endpoint for what is, per user, a modest dataset |
 | 36 | Manual "Add problem" entry deferred | Filed as a separate issue (#44), not folded into #40 | User asked for it mid-review; it's a capture path (PRD's manual-form fallback), not a Problems-screen read/filter concern, and needs entry points on both Overview and Problems |
+
+## 2026-07-27 - Manual "Add problem" entry (issue #44)
+
+Designed in a lavish session, then implemented, delivering the manual capture path deferred at decision #36 and superseding decision #34's read-only `<pre>` code view.
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 37 | Manual entry posts through the existing capture path | `/problems/new` form builds a `CaptureSubmission` and posts it to the same `POST /submissions` endpoint the extension uses, rather than a dedicated manual-entry endpoint | One capture ingestion path for both the extension and the manual form avoids divergent validation/enrichment behavior |
+| 38 | Manual-entry language select defaults to Java | `apps/web/src/app/problems/new/AddProblemForm.tsx` | Reviewer feedback in the lavish session |
+| 39 | Code view (submission page) and code entry (new-problem form) share one CodeMirror 6 component | Added `apps/web/src/app/CodeEditor.tsx`; the read-only `CodeViewer` and the editable `AddProblemForm` both render it, replacing the plain `<pre>` from decision #34 | Reviewer feedback in the lavish session; keeps syntax highlighting and styling in one place instead of duplicating a code surface |
+| 40 | Editor background is `#1b1b1b` | Changed from an initial `#1e1c19` in `CodeEditor.tsx`'s theme | Reviewer feedback: better text contrast |
