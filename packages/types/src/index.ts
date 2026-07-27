@@ -133,3 +133,47 @@ export const RevisionQueueItem = z.object({
   intervalDays: z.number().int().nullable(),
 });
 export type RevisionQueueItem = z.infer<typeof RevisionQueueItem>;
+
+/** One pattern's solve count and last-solved date, for the Insights coverage chart. */
+export const PatternCoverage = z.object({
+  pattern: z.string(),
+  count: z.number().int(),
+  lastSolvedAt: z.coerce.date(),
+});
+export type PatternCoverage = z.infer<typeof PatternCoverage>;
+
+/** One solved submission on a calendar day, for the Insights day-detail drill-down. */
+export const CalendarDaySubmission = z.object({
+  id: z.string(),
+  title: z.string(),
+  level: Level,
+});
+export type CalendarDaySubmission = z.infer<typeof CalendarDaySubmission>;
+
+/** One day's activity in the Insights calendar heatmap. */
+export const CalendarDay = z.object({
+  date: z.string(), // YYYY-MM-DD (UTC)
+  count: z.number().int(),
+  submissions: z.array(CalendarDaySubmission),
+});
+export type CalendarDay = z.infer<typeof CalendarDay>;
+
+/** Aggregate practice stats for the Insights screen. */
+export const InsightsSummary = z.object({
+  today: z.number().int(),
+  thisWeek: z.number().int(),
+  lastWeek: z.number().int(),
+  thisMonth: z.number().int(),
+  lastMonth: z.number().int(),
+  patternsTouched: z.number().int(),
+  patternCoverage: z.array(PatternCoverage),
+  weakestPatterns: z.array(z.string()),
+  difficultyMix: z.object({ easy: z.number().int(), medium: z.number().int(), hard: z.number().int() }),
+  currentStreak: z.number().int(),
+  longestStreak: z.number().int(),
+  calendarYear: z.number().int(),
+  calendarTotal: z.number().int(),
+  activeDays: z.number().int(),
+  days: z.array(CalendarDay),
+});
+export type InsightsSummary = z.infer<typeof InsightsSummary>;
