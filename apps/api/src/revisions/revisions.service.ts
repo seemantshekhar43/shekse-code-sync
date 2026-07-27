@@ -45,7 +45,9 @@ export class RevisionsService {
   async queue(userId: string): Promise<RevisionQueueItem[]> {
     const now = new Date();
     const submissions = await markedSubmissions(userId);
-    const items = submissions.map(toQueueItem).filter((item) => item.dueAt === null || item.dueAt <= now);
+    const items = submissions
+      .map(toQueueItem)
+      .filter((item: RevisionQueueItem) => item.dueAt === null || item.dueAt <= now);
     return sortByDueAt(items);
   }
 
