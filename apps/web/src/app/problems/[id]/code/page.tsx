@@ -3,6 +3,7 @@ import { auth } from "../../../../auth";
 import { mintScsToken } from "../../../../lib/scs-token";
 import { getSubmissionCode } from "../../../../lib/submissions-api";
 import { DashboardHeader } from "../../../DashboardHeader";
+import { CodeViewer } from "./CodeViewer";
 import { CopyCodeButton } from "./CopyCodeButton";
 
 export default async function SubmissionCodePage({ params }: { params: { id: string } }) {
@@ -69,9 +70,7 @@ export default async function SubmissionCodePage({ params }: { params: { id: str
           <div className="mb-2 flex justify-end">
             <CopyCodeButton code={result.code} />
           </div>
-          <pre className="overflow-x-auto rounded-card border border-border bg-surface p-4 font-mono text-[12.5px] leading-relaxed text-ink">
-            <code>{result.code}</code>
-          </pre>
+          <CodeViewer code={result.code} language={result.language} />
           <p className="mt-3 text-[11.5px] text-faint">
             Read-only, fetched from your GitHub repo. Edit the file on GitHub - it stays the source
             of truth.

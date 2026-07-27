@@ -123,6 +123,28 @@ Conventions:
 - **Before marking work done, verify the actual behavior end-to-end** (drive the real flow via the `verify`/`run`/`chrome-devtools-axi` skills), not just green unit tests. A green test suite is necessary, not sufficient.
 - Don't close an issue / mark a task done while typecheck, lint, or tests fail.
 
+### Local E2E runbook for the web dashboard (chrome-devtools-axi)
+
+Known gotchas discovered while verifying the Add-problem feature - follow this to avoid re-discovering them each session.
+
+1. **Bring up the stack**: `docker compose up -d postgres redis` (usually already running - check `docker compose ps` first), then start api + web with the root `.env` actually loaded into the shell (turbo/pnpm dev does **not** read the root `.env` into `apps/web`/`apps/api` on its own - `AUTH_SECRET` etc. end up unset and NextAuth throws `MissingSecret`):
+   ```bash
+   set -a && source .env && set +a
+   pnpm --filter @scs/api dev > /tmp/scs-api.log 2>&1 &
+   pnpm --filter @scs/web dev > /tmp/scs-web.log 2>&1 &
+   ```
+2. **Auth**: there is no dev-login bypass - `apps/web/src/auth.ts` is real GitHub OAuth only. `chrome-devtools-axi` launches an isolated, **headless-by-default** browser the user cannot see or click into, so a plain "sign in" click leaves you stuck on GitHub's login form with no way for the user to help. Relaunch it visible and with a persistent profile so the user can complete the OAuth login by hand, once, and it's reused after:
+   ```bash
+   CHROME_DEVTOOLS_AXI_HEADED=1 CHROME_DEVTOOLS_AXI_USER_DATA_DIR="/tmp/scs-chrome-profile" npx -y chrome-devtools-axi open http://localhost:3000
+   ```
+   Ask the user to click "Sign in with GitHub" and complete it in that window; every subsequent `chrome-devtools-axi` command in the session must repeat the same `CHROME_DEVTOOLS_AXI_HEADED=1 CHROME_DEVTOOLS_AXI_USER_DATA_DIR=...` env pair to reuse the signed-in profile/cookies.
+3. **Screenshots**: relative screenshot paths sometimes silently fail to land where `ls`/`find`/`Read` can see them (sandbox/profile filesystem view mismatch). Always pass an **absolute path inside the session scratchpad directory** - that location reliably round-trips:
+   ```bash
+   chrome-devtools-axi screenshot /private/tmp/claude-501/.../scratchpad/name.png
+   ```
+4. **Element refs go stale fast** in dev mode (HMR/fast-refresh bumps the snapshot generation even with no real DOM change) - re-run `snapshot` immediately before `click`/`fill` rather than reusing a ref from a few commands ago.
+5. **Tear down** when done so the next session isn't left with orphaned processes: `chrome-devtools-axi stop`, `pkill -f "next dev"`, `pkill -f "src/main.ts"`.
+
 ## Conventions
 
 - Never use the em dash; use a plain dash.

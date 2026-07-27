@@ -154,6 +154,12 @@ export default async function HomePage({
           <div>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="font-serif text-lg font-semibold">Recent submissions</h3>
+              <a
+                href="/problems/new"
+                className="rounded-btn bg-green px-3 py-1.5 text-xs font-semibold text-white"
+              >
+                Add problem
+              </a>
             </div>
             {recent.length === 0 ? (
               <p className="rounded-card border border-dashed border-border p-8 text-center text-sm text-muted">
