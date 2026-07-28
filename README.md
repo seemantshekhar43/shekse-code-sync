@@ -159,6 +159,18 @@ This project is open source and contributions are welcome - bug reports, feature
 - **Want to contribute code?** Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the fork/branch/PR workflow, code style, and testing expectations.
 - **Working conventions** (issue-driven flow, decision log, how AI coding agents should operate in this repo) live in [`CLAUDE.md`](CLAUDE.md) / `AGENTS.md`.
 
+## Built with the axi tools
+
+This project is developed with a set of CLI tools by [kunchenguid](https://axi.md/) that pair well with AI coding agents:
+
+- [**axi.md**](https://axi.md/) - the project/tool suite this repo's workflow is built around.
+- [**no-mistakes**](https://github.com/kunchenguid/no-mistakes) - a local validation gate (AI code review, tests, lint, push, PR, CI monitoring) run before a change reaches `origin`.
+- [**lavish**](https://github.com/kunchenguid/lavish-axi) - turns a plan, design decision, or comparison into a reviewable HTML artifact.
+- [**gh-axi**](https://github.com/kunchenguid/gh-axi) - a CLI for GitHub operations (issues, PRs, CI, releases).
+- [**chrome-devtools-axi**](https://github.com/kunchenguid/chrome-devtools-axi) - drives a real Chrome session to verify UI changes end-to-end.
+
+If you're contributing here (or building your own project alongside an AI coding agent), these are worth a look for the same reasons we use them: they catch real bugs before a PR goes up and keep the loop between "I made a change" and "I know it works" short.
+
 ## License
 
 [MIT](LICENSE) - use it, fork it, ship it.
