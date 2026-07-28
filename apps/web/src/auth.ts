@@ -1,6 +1,6 @@
-import { prisma } from "@scs/db";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
+import { upsertUserByEmail } from "./lib/internal-api";
 
 /**
  * Auth.js (NextAuth v5) - multi-user login via GitHub OAuth.
@@ -56,15 +56,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email =
           profile.email ?? (await resolveGitHubPrimaryEmail(account?.access_token));
         if (email) {
-          const user = await prisma.user.upsert({
-            where: { email },
-            update: { name: (profile.name as string | undefined) ?? undefined },
-            create: {
-              email,
-              name: (profile.name as string | undefined) ?? null,
-            },
-            select: { id: true },
-          });
+          const user = await upsertUserByEmail(email, (profile.name as string | undefined) ?? null);
           token.userId = user.id;
         }
         // GitHub login (handle), used to verify App-install ownership later.

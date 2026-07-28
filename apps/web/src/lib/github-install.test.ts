@@ -1,26 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@scs/db", () => ({
-  prisma: { user: { update: vi.fn(), findUniqueOrThrow: vi.fn() } },
-}));
-
 vi.mock("@scs/github", () => ({
   getInstallationAccount: vi.fn(),
   listInstallationRepos: vi.fn(),
   uninstallInstallation: vi.fn(),
 }));
 
+vi.mock("./internal-api.js", () => ({
+  setInstallation: vi.fn(),
+  disconnectUser: vi.fn(),
+}));
+
 vi.mock("./scs-token.js", () => ({
   verifyInstallState: vi.fn(),
 }));
 
-import { prisma } from "@scs/db";
 import { getInstallationAccount, listInstallationRepos, uninstallInstallation } from "@scs/github";
 import {
   disconnectInstallation,
   persistInstallation,
   resolveInstallationForUser,
 } from "./github-install.js";
+import { disconnectUser, setInstallation } from "./internal-api.js";
 import { verifyInstallState } from "./scs-token.js";
 
 const account = (login: string, type = "User") => ({ login, type });
@@ -107,53 +108,32 @@ describe("persistInstallation", () => {
   it("writes the installation id and repo onto the user row", async () => {
     await persistInstallation("u1", 149148749, "octocat/solutions");
 
-    expect(prisma.user.update).toHaveBeenCalledWith({
-      where: { id: "u1" },
-      data: { githubInstallationId: "149148749", githubRepo: "octocat/solutions" },
-    });
+    expect(setInstallation).toHaveBeenCalledWith("u1", "149148749", "octocat/solutions");
   });
 });
 
 describe("disconnectInstallation", () => {
-  it("revokes the installation, clears the repo fields, and bumps tokenVersion", async () => {
-    vi.mocked(prisma.user.findUniqueOrThrow).mockResolvedValue({
-      githubInstallationId: "149148749",
-    } as never);
+  it("revokes the installation after clearing the stored association", async () => {
+    vi.mocked(disconnectUser).mockResolvedValue({ previousInstallationId: "149148749" });
 
     await disconnectInstallation("u1");
 
+    expect(disconnectUser).toHaveBeenCalledWith("u1");
     expect(uninstallInstallation).toHaveBeenCalledWith(149148749);
-    expect(prisma.user.update).toHaveBeenCalledWith({
-      where: { id: "u1" },
-      data: { githubInstallationId: null, githubRepo: null, tokenVersion: { increment: 1 } },
-    });
   });
 
-  it("still clears local state when GitHub revocation fails", async () => {
-    vi.mocked(prisma.user.findUniqueOrThrow).mockResolvedValue({
-      githubInstallationId: "149148749",
-    } as never);
+  it("does not throw when GitHub revocation fails", async () => {
+    vi.mocked(disconnectUser).mockResolvedValue({ previousInstallationId: "149148749" });
     vi.mocked(uninstallInstallation).mockRejectedValueOnce(new Error("already uninstalled"));
 
     await expect(disconnectInstallation("u1")).resolves.toBeUndefined();
-
-    expect(prisma.user.update).toHaveBeenCalledWith({
-      where: { id: "u1" },
-      data: { githubInstallationId: null, githubRepo: null, tokenVersion: { increment: 1 } },
-    });
   });
 
-  it("skips the GitHub call when there is no installation to revoke", async () => {
-    vi.mocked(prisma.user.findUniqueOrThrow).mockResolvedValue({
-      githubInstallationId: null,
-    } as never);
+  it("skips the GitHub call when there was no installation to revoke", async () => {
+    vi.mocked(disconnectUser).mockResolvedValue({ previousInstallationId: null });
 
     await disconnectInstallation("u1");
 
     expect(uninstallInstallation).not.toHaveBeenCalled();
-    expect(prisma.user.update).toHaveBeenCalledWith({
-      where: { id: "u1" },
-      data: { githubInstallationId: null, githubRepo: null, tokenVersion: { increment: 1 } },
-    });
   });
 });

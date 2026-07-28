@@ -139,9 +139,6 @@ importers:
       '@codemirror/view':
         specifier: ^6.43.6
         version: 6.43.6
-      '@scs/db':
-        specifier: workspace:*
-        version: link:../../packages/db
       '@scs/github':
         specifier: workspace:*
         version: link:../../packages/github

@@ -1,5 +1,5 @@
-import { prisma } from "@scs/db";
 import type { Session } from "next-auth";
+import { getUser } from "./internal-api";
 import { mintInstallState, mintScsToken } from "./scs-token";
 
 export type HeaderData = {
@@ -20,7 +20,7 @@ export async function getHeaderData(session: Session): Promise<HeaderData> {
   const [token, installState, user] = await Promise.all([
     mintScsToken(userId),
     mintInstallState(userId),
-    prisma.user.findUnique({ where: { id: userId }, select: { githubRepo: true } }),
+    getUser(userId),
   ]);
 
   const appSlug = process.env.NEXT_PUBLIC_GITHUB_APP_SLUG;
