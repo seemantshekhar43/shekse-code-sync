@@ -65,10 +65,6 @@ services:
     env_file: .env
     environment:
       API_BASE_URL: http://api:3001
-      # `web` queries Prisma directly (Auth.js user upsert in auth.ts), same
-      # as api/worker - without this it falls back to .env's localhost value,
-      # which doesn't resolve inside the container.
-      DATABASE_URL: postgresql://scs:scs@postgres:5432/shekse_code_sync?schema=public
       # `next start` runs Auth.js in production mode, which refuses to trust
       # the request Host header unless told to - dev mode (`next dev`) trusts
       # localhost automatically, so this only surfaces once containerized.

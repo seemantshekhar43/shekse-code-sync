@@ -1,10 +1,10 @@
-import { prisma } from "@scs/db";
 import {
   getInstallationAccount,
   type InstallationRepo,
   listInstallationRepos,
   uninstallInstallation,
 } from "@scs/github";
+import { disconnectUser, setInstallation } from "./internal-api";
 import { verifyInstallState } from "./scs-token";
 
 /**
@@ -16,45 +16,26 @@ export async function persistInstallation(
   installationId: number,
   fullName: string,
 ): Promise<void> {
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      githubInstallationId: String(installationId),
-      githubRepo: fullName,
-    },
-  });
+  await setInstallation(userId, String(installationId), fullName);
 }
 
 /**
- * Disconnect a user's GitHub App installation: best-effort revoke it on
- * GitHub, then clear the stored association regardless of whether the revoke
- * succeeded (the installation may already be gone on GitHub's side). Our DB
- * is the source of whether the user is "connected". Also bumps `tokenVersion`
- * so every previously-minted extension token is invalidated - a fresh one is
- * only handed out the next time this user's session mints one.
+ * Disconnect a user's GitHub App installation: clear the stored association
+ * (bumping `tokenVersion` so every previously-minted extension token is
+ * invalidated), then best-effort revoke the installation on GitHub - our DB
+ * is the source of whether the user is "connected", so a revoke failure
+ * (already uninstalled, transient error) never blocks the local disconnect.
  */
 export async function disconnectInstallation(userId: string): Promise<void> {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
-    select: { githubInstallationId: true },
-  });
+  const { previousInstallationId } = await disconnectUser(userId);
 
-  if (user.githubInstallationId) {
+  if (previousInstallationId) {
     try {
-      await uninstallInstallation(Number(user.githubInstallationId));
+      await uninstallInstallation(Number(previousInstallationId));
     } catch {
       // Best-effort: the installation may already be gone on GitHub's side.
     }
   }
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      githubInstallationId: null,
-      githubRepo: null,
-      tokenVersion: { increment: 1 },
-    },
-  });
 }
 
 /** Failure reasons map 1:1 to the `/?github=` banner keys on the dashboard. */

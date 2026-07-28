@@ -1,5 +1,5 @@
-import { prisma } from "@scs/db";
 import { jwtVerify, SignJWT } from "jose";
+import { getUser } from "./internal-api";
 
 /**
  * Mint a ShekseCodeSync token for the extension: a JWT carrying the user's id
@@ -14,10 +14,7 @@ export async function mintScsToken(userId: string): Promise<string> {
   if (!secret) {
     throw new Error("SCS_TOKEN_SECRET is not set");
   }
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
-    select: { tokenVersion: true },
-  });
+  const user = await getUser(userId);
   return new SignJWT({ ver: user.tokenVersion })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
