@@ -51,26 +51,7 @@ flowchart TB
 4. The **worker** reads the statement + solution back from GitHub and asks an AI provider for complexity, pattern, and optimization notes.
 5. The **web dashboard** shows your full history, a spaced-repetition (SM-2) revision queue, and an insights view (calendar heatmap, difficulty mix, pattern coverage, streaks).
 
-See [`docs/TECH_STACK.md`](docs/TECH_STACK.md) for the full stack rationale and [`docs/PRD.md`](docs/PRD.md) for the data model.
-
-## Status
-
-Monorepo scaffolded and green in CI; first MVP read-path slice done. See the docs:
-
-- [Product Requirements](docs/PRD.md)
-- [Tech Stack](docs/TECH_STACK.md)
-- [Decision Log](docs/DECISIONS.md)
-- [Design Direction](docs/DESIGN.md)
-- [Feature Ideas (v2+ candidates)](docs/FEATURE_IDEAS.md) - draft brainstorm for review
-
-Work is tracked as GitHub issues; **open issues are the backlog, closed issues are done**.
-
-```bash
-gh issue list --state open      # what's next
-gh issue list --state closed    # what's done
-```
-
-Done so far: PRD + tech stack signed off, monorepo scaffolded (apps + shared packages, Docker, CI), read-path MVP slice (list submissions), capture write-path MVP slice (commit each problem to the user's GitHub repo on capture, GitHub as source of truth), AI-analysis slice (worker reads the statement + solution back from GitHub and writes complexity/pattern/optimization notes), web dashboard rebuilt in the locked axi.md design, Problems screen (filterable/sortable/paginated submissions grid with per-row GitHub sync status and a read-only code viewer), manual "Add problem" entry point, SRS revision engine (SM-2 scheduler, `POST /revisions` rating + `GET /revisions/queue`, Overview rail wired to real due dates), dedicated Revision screen (`GET /revisions/full-queue`, due-now/soon/upcoming segments, remove-from-queue action), dedicated Insights screen (`GET /insights?year=`, full-year calendar heatmap with click-through, difficulty mix, pattern coverage, streaks, rule-based AI observations). Next up (open issues): LLM-generated AI insights (#51), live end-to-end tests.
+See [`docs/TECH_STACK.md`](docs/TECH_STACK.md) for the full stack rationale, [`docs/PRD.md`](docs/PRD.md) for the data model, and [`docs/STATUS.md`](docs/STATUS.md) for current build status and what's next.
 
 ## Getting started (local dev)
 
@@ -142,7 +123,9 @@ These are reasoned starting points, not load-tested numbers - revisit if usage p
 
 Every merge to `main` builds `apps/api/Dockerfile` and `apps/worker/Dockerfile` and pushes them to GHCR, tagged `latest` and the commit SHA (for rollback): `ghcr.io/<owner>/scs-api`, `ghcr.io/<owner>/scs-worker`. `web` is not part of this - it deploys separately via Vercel.
 
-On the host running `docker-compose.yml`, pull and restart manually once a merge lands:
+Pushing a semver tag (`v*.*.*`) additionally builds and pushes images tagged with that version and creates a GitHub Release with the `docker pull` commands in its notes. Either way, each package (`scs-api`, `scs-worker`) keeps only its 3 most recent image versions - older ones are pruned automatically.
+
+On the host running `docker-compose.yml`, pull and restart manually once a merge (or release) lands:
 
 ```bash
 docker compose pull api worker
