@@ -4,13 +4,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-Every DSA problem you solve on LeetCode or NeetCode, automatically version-controlled in your own GitHub repo, enriched with AI analysis, and turned into a searchable dashboard with a spaced-repetition revision engine.
+Every DSA problem you solve on LeetCode, automatically version-controlled in your own GitHub repo, enriched with AI analysis, and turned into a searchable dashboard with a spaced-repetition revision engine.
 
 ## The problem this solves
 
 If you practice data structures & algorithms regularly (interview prep, competitive programming, or just for fun), your solved problems end up scattered and disposable:
 
-- LeetCode/NeetCode submission history has no lasting home you control - it's locked into the platform's UI.
+- LeetCode submission history has no lasting home you control - it's locked into the platform's UI.
 - There's no record of *how* you solved something (approach, complexity, pattern used) beyond the code itself, so revisiting an old problem means re-deriving everything from scratch.
 - Nothing resurfaces problems for you at the right time to actually retain them - once solved, a problem is effectively forgotten.
 - There's no single view across your practice history to see patterns, gaps, streaks, or progress.
@@ -25,7 +25,7 @@ ShekseCodeSync fixes this by treating **your solved problems as a personal, vers
 
 ```mermaid
 flowchart TB
-  Ext["extension - WXT + React<br/>(captures on LeetCode / NeetCode)"]
+  Ext["extension - WXT + React<br/>(captures on LeetCode)"]
   Web["web - Next.js dashboard<br/>(Auth.js / GitHub OAuth login)"]
   Api["api - NestJS HTTP API"]
   Worker["worker - NestJS<br/>(BullMQ consumer)"]
@@ -45,7 +45,7 @@ flowchart TB
   Worker -->|"complexity / pattern / optimization"| AI
 ```
 
-1. You solve a problem on LeetCode or NeetCode; the **extension** captures the question and your accepted solution.
+1. You solve a problem on LeetCode; the **extension** captures the question and your accepted solution.
 2. The **API** commits both to your own GitHub repo (GitHub is the source of truth for your content) and indexes metadata in Postgres.
 3. It returns immediately - capture never waits on an AI call. A job is enqueued for the **worker**.
 4. The **worker** reads the statement + solution back from GitHub and asks an AI provider for complexity, pattern, and optimization notes.
@@ -70,7 +70,7 @@ gh issue list --state open      # what's next
 gh issue list --state closed    # what's done
 ```
 
-Done so far: PRD + tech stack signed off, monorepo scaffolded (apps + shared packages, Docker, CI), read-path MVP slice (list submissions), capture write-path MVP slice (commit each problem to the user's GitHub repo on capture, GitHub as source of truth), AI-analysis slice (worker reads the statement + solution back from GitHub and writes complexity/pattern/optimization notes), web dashboard rebuilt in the locked axi.md design, Problems screen (filterable/sortable/paginated submissions grid with per-row GitHub sync status and a read-only code viewer), manual "Add problem" entry point, SRS revision engine (SM-2 scheduler, `POST /revisions` rating + `GET /revisions/queue`, Overview rail wired to real due dates), dedicated Revision screen (`GET /revisions/full-queue`, due-now/soon/upcoming segments, remove-from-queue action), dedicated Insights screen (`GET /insights?year=`, full-year calendar heatmap with click-through, difficulty mix, pattern coverage, streaks, rule-based AI observations). Next up (open issues): LLM-generated AI insights (#51), NeetCode capture adapter, live end-to-end tests.
+Done so far: PRD + tech stack signed off, monorepo scaffolded (apps + shared packages, Docker, CI), read-path MVP slice (list submissions), capture write-path MVP slice (commit each problem to the user's GitHub repo on capture, GitHub as source of truth), AI-analysis slice (worker reads the statement + solution back from GitHub and writes complexity/pattern/optimization notes), web dashboard rebuilt in the locked axi.md design, Problems screen (filterable/sortable/paginated submissions grid with per-row GitHub sync status and a read-only code viewer), manual "Add problem" entry point, SRS revision engine (SM-2 scheduler, `POST /revisions` rating + `GET /revisions/queue`, Overview rail wired to real due dates), dedicated Revision screen (`GET /revisions/full-queue`, due-now/soon/upcoming segments, remove-from-queue action), dedicated Insights screen (`GET /insights?year=`, full-year calendar heatmap with click-through, difficulty mix, pattern coverage, streaks, rule-based AI observations). Next up (open issues): LLM-generated AI insights (#51), live end-to-end tests.
 
 ## Getting started (local dev)
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /** Platforms we capture from. */
-export const Platform = z.enum(["leetcode", "neetcode", "manual"]);
+export const Platform = z.enum(["leetcode", "manual"]);
 export type Platform = z.infer<typeof Platform>;
 
 /** Problem difficulty. */
