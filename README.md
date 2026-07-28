@@ -75,6 +75,28 @@ pnpm dev                           # runs web, api, worker together via Turborep
 
 `.env.example` documents every variable, including how to register the GitHub OAuth App and GitHub App the login and repo-write flows need. `pnpm test`, `pnpm typecheck`, and `pnpm lint` run across the whole workspace; see [`CLAUDE.md`](CLAUDE.md) for the full local runbook (Chrome-driven UI verification, the `no-mistakes` validation gate, etc.) if you're contributing.
 
+## System requirements
+
+### Local development
+
+- **Docker memory: allocate at least 4GB, ideally 6GB+.** Building `api`/`worker`/`web`'s images concurrently (`docker compose up --build`) has been observed to OOM-kill `pnpm install` on a Docker Desktop VM with ~2GB allocated. If you're memory-constrained, build one service at a time instead (`docker compose build api && docker compose build worker && docker compose build web`).
+- **Disk: ~10GB free** — pnpm's store + each app's `node_modules`, Docker image layers for five services, and the Postgres data volume.
+
+### Production (self-hosted, sized for ~50 active users)
+
+This is a low-traffic, bursty workload (people solving problems occasionally, not a high-QPS API), so the footprint stays small even fully loaded. `web` runs on Vercel and isn't part of this budget — this is for whatever's hosting `api` + `worker` + `postgres` + `redis`:
+
+| Service | RAM | vCPU | Why |
+|---|---|---|---|
+| `api` | 512MB–1GB | 1 | Request volume is low and bursty: dashboard reads + capture writes |
+| `worker` | 512MB–1GB | 1 | Network-bound on the AI provider call, not CPU-heavy |
+| `postgres` | 1–2GB | 1 | Dataset stays small — even a few hundred problems per user across 50 users is well under 1GB of data |
+| `redis` | 256MB | shared | Just BullMQ queue state; no meaningful storage |
+
+**Recommended: 4 vCPUs, 6–8GB RAM, 20GB disk** for the host running those four services — the extra headroom over the per-service numbers above covers Postgres growth, Docker image layers, logs, and (if self-hosting like the maintainer does) Caddy/`cloudflared` running alongside it on the same box.
+
+These are reasoned starting points, not load-tested numbers — revisit if usage patterns (AI-enrichment concurrency, solution code size, submission volume per user) diverge from a typical DSA-practice history.
+
 ## Stack
 
 TypeScript monorepo (pnpm + Turborepo): WXT extension, NestJS API + worker, Next.js dashboard, Postgres + Prisma, BullMQ + Redis, Claude Opus 4.8 via a provider-agnostic Vercel AI SDK layer, Auth.js + GitHub App, all in one `docker-compose.yml`. Self-hosted.
