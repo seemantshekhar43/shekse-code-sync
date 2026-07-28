@@ -193,3 +193,11 @@ Follow-up from the deployment-topology checklist (`.lavish/deployment-topology.h
 | # | Decision | Choice | Why |
 |---|---|---|---|
 | 75 | Drop `neetcode` from the `Platform` enum and all product code/docs; keep only `leetcode` + `manual` | `Platform` enum in `packages/db/prisma/schema.prisma` and `packages/types/src/index.ts` reduced to `leetcode` / `manual`; matching UI (Problems filters, platform column, Add-problem form) and docs (README, PRD, CLAUDE.md, FEATURE_IDEAS) updated to match | NeetCode capture was never actually implemented and isn't in current scope; row 3 above (2026-07-25) is left as-is since it reflects what was decided at launch time - this entry supersedes it going forward. Dev-only DB, so the enum value was dropped via a clean migration rather than a backfill |
+
+## 2026-07-28 - GHCR image retention and tag-cut release workflow (issue #64)
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 76 | Keep only the 3 most recent versions per GHCR package | `actions/delete-package-versions` step added to `build-images.yml` and mirrored in the new `release.yml`, `min-versions-to-keep: 3` for `scs-api` and `scs-worker` | Bounds GHCR storage growth from every merge and every tagged release without needing a separate cleanup job |
+| 77 | New `.github/workflows/release.yml` triggers on a `v*.*.*` tag push, builds version-tagged images, and creates a GitHub Release whose body is GHCR `docker pull` commands only - no docker-save tarballs attached | Matrix build over `[api, worker]`, then `softprops/action-gh-release` with `docker pull ghcr.io/.../scs-{api,worker}:${{ github.ref_name }}` in the notes | Confirmed with the user: GHCR is already the distribution channel `docker-compose.yml` pulls from, and tarball release assets would duplicate storage for no benefit, plus hit GitHub's 2GB-per-file release-asset limit |
+| 78 | Moved README's in-progress "Status" section to a new `docs/STATUS.md`, linked from README | Build state / done-so-far / next-up content relocated verbatim; README's Docker-images section gained a paragraph on tag-triggered releases and the 3-version retention | Keeps README focused on what the project is and how to use it, not development-in-progress tracking |
