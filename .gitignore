@@ -36,3 +36,6 @@ pnpm-debug.log*
 
 # lavish working sessions (canonical export lives in docs/design/)
 .lavish/
+
+# Local-only tracking, not repo state
+PRODUCTION_CHECKLIST.local.md
