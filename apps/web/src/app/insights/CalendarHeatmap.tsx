@@ -139,7 +139,13 @@ export function CalendarHeatmap({
                 key={s.id}
                 className="flex items-center justify-between gap-2 border-b border-border py-1.5 text-[12.5px] last:border-b-0"
               >
-                <span>{s.title}</span>
+                {s.synced ? (
+                  <a href={`/problems/${s.id}/code`} className="hover:underline">
+                    {s.title}
+                  </a>
+                ) : (
+                  <span>{s.title}</span>
+                )}
                 <span className={`shrink-0 rounded-pill px-2 py-0.5 text-[10px] font-semibold ${pillClass[s.level]}`}>
                   {s.level}
                 </span>

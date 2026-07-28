@@ -33,6 +33,7 @@ export class InsightsService {
         title: true,
         level: true,
         solvedAt: true,
+        repoPath: true,
         analysis: { select: { pattern: true } },
       },
     });
@@ -51,7 +52,10 @@ export class InsightsService {
     let lastMonth = 0;
     const difficultyMix = { easy: 0, medium: 0, hard: 0 };
     const patternStats = new Map<string, { count: number; lastSolvedAt: Date }>();
-    const dayBuckets = new Map<string, { count: number; submissions: { id: string; title: string; level: Level }[] }>();
+    const dayBuckets = new Map<
+      string,
+      { count: number; submissions: { id: string; title: string; level: Level; synced: boolean }[] }
+    >();
 
     for (const s of submissions) {
       const solvedAt = s.solvedAt;
@@ -78,7 +82,7 @@ export class InsightsService {
         const key = utcDateKey(solvedAt);
         const bucket = dayBuckets.get(key) ?? { count: 0, submissions: [] };
         bucket.count += 1;
-        bucket.submissions.push({ id: s.id, title: s.title, level: s.level });
+        bucket.submissions.push({ id: s.id, title: s.title, level: s.level, synced: s.repoPath !== null });
         dayBuckets.set(key, bucket);
       }
     }
