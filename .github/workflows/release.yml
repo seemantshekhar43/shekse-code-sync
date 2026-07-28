@@ -1,11 +1,12 @@
-name: Build images
+name: Release images
 
 on:
   push:
-    branches: [main]
+    tags:
+      - "v*.*.*"
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -23,21 +24,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/scs-${{ matrix.service }}
-          tags: |
-            type=raw,value=latest
-            type=sha,format=long
-
       - uses: docker/build-push-action@v6
         with:
           context: .
           file: apps/${{ matrix.service }}/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ghcr.io/${{ github.repository_owner }}/scs-${{ matrix.service }}:${{ github.ref_name }}
 
       - name: Prune old image versions (keep last 3)
         uses: actions/delete-package-versions@v5
@@ -45,3 +37,18 @@ jobs:
           package-name: scs-${{ matrix.service }}
           package-type: container
           min-versions-to-keep: 3
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## Images
+
+            ```bash
+            docker pull ghcr.io/${{ github.repository_owner }}/scs-api:${{ github.ref_name }}
+            docker pull ghcr.io/${{ github.repository_owner }}/scs-worker:${{ github.ref_name }}
+            ```
