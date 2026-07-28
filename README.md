@@ -97,6 +97,19 @@ This is a low-traffic, bursty workload (people solving problems occasionally, no
 
 These are reasoned starting points, not load-tested numbers — revisit if usage patterns (AI-enrichment concurrency, solution code size, submission volume per user) diverge from a typical DSA-practice history.
 
+## Deploying `api`/`worker`
+
+Every merge to `main` builds `apps/api/Dockerfile` and `apps/worker/Dockerfile` and pushes them to GHCR, tagged `latest` and the commit SHA (for rollback): `ghcr.io/<owner>/scs-api`, `ghcr.io/<owner>/scs-worker`. `web` is not part of this - it deploys separately via Vercel.
+
+On the host running `docker-compose.yml`, pull and restart manually once a merge lands:
+
+```bash
+docker compose pull api worker
+docker compose up -d api worker
+```
+
+This is a manual step by design (this project's convention: start simple, automate only if it becomes friction) - no auto-deploy agent like Watchtower is running.
+
 ## Stack
 
 TypeScript monorepo (pnpm + Turborepo): WXT extension, NestJS API + worker, Next.js dashboard, Postgres + Prisma, BullMQ + Redis, Claude Opus 4.8 via a provider-agnostic Vercel AI SDK layer, Auth.js + GitHub App, all in one `docker-compose.yml`. Self-hosted.
