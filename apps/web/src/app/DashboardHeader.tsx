@@ -1,4 +1,6 @@
-import { signOut } from "../auth";
+import { auth, signOut } from "../auth";
+import { disconnectInstallation } from "../lib/github-install";
+import { mintScsToken } from "../lib/scs-token";
 import { AvatarMenu } from "./AvatarMenu";
 
 const navItems = [
@@ -54,6 +56,18 @@ export function DashboardHeader({
         signOutAction={async () => {
           "use server";
           await signOut();
+        }}
+        disconnectAction={async () => {
+          "use server";
+          const session = await auth();
+          if (!session?.userId) return;
+          await disconnectInstallation(session.userId);
+        }}
+        mintTokenAction={async () => {
+          "use server";
+          const session = await auth();
+          if (!session?.userId) return "";
+          return mintScsToken(session.userId);
         }}
       />
     </div>

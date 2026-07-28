@@ -1,7 +1,13 @@
 import type { ExecutionContext } from "@nestjs/common";
 import { UnauthorizedException } from "@nestjs/common";
 import { SignJWT } from "jose";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@scs/db", () => ({
+  prisma: { user: { findUniqueOrThrow: vi.fn().mockResolvedValue({ tokenVersion: 0 }) } },
+}));
+
+import { prisma } from "@scs/db";
 import { ScsAuthGuard } from "./scs-auth.guard.js";
 
 const SECRET = "test-secret-value";
@@ -16,8 +22,8 @@ function ctxWithAuth(header?: string): { ctx: ExecutionContext; req: { userId?: 
   return { ctx, req };
 }
 
-async function mint(sub: string, secret = SECRET): Promise<string> {
-  return new SignJWT({})
+async function mint(sub: string, ver = 0, secret = SECRET): Promise<string> {
+  return new SignJWT({ ver })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(sub)
     .sign(new TextEncoder().encode(secret));
@@ -28,6 +34,7 @@ describe("ScsAuthGuard", () => {
 
   beforeEach(() => {
     process.env.SCS_TOKEN_SECRET = SECRET;
+    vi.mocked(prisma.user.findUniqueOrThrow).mockResolvedValue({ tokenVersion: 0 } as never);
   });
 
   it("resolves the userId from a valid bearer token", async () => {
@@ -47,7 +54,13 @@ describe("ScsAuthGuard", () => {
   });
 
   it("rejects a token signed with a different secret", async () => {
-    const { ctx } = ctxWithAuth(`Bearer ${await mint("user_123", "wrong-secret")}`);
+    const { ctx } = ctxWithAuth(`Bearer ${await mint("user_123", 0, "wrong-secret")}`);
+    await expect(guard.canActivate(ctx)).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+
+  it("rejects a token whose version no longer matches the user's current tokenVersion", async () => {
+    vi.mocked(prisma.user.findUniqueOrThrow).mockResolvedValue({ tokenVersion: 1 } as never);
+    const { ctx } = ctxWithAuth(`Bearer ${await mint("user_123", 0)}`);
     await expect(guard.canActivate(ctx)).rejects.toBeInstanceOf(UnauthorizedException);
   });
 });

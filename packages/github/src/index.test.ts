@@ -9,6 +9,7 @@ import {
   type OctokitLike,
   parseRepo,
   slugify,
+  uninstallInstallationWith,
 } from "./index.js";
 
 describe("github helpers", () => {
@@ -138,6 +139,19 @@ describe("getInstallationAccountWith", () => {
 
     await expect(getInstallationAccountWith({ request }, 1)).rejects.toThrow(
       /no resolvable account/,
+    );
+  });
+});
+
+describe("uninstallInstallationWith", () => {
+  it("calls the delete-installation endpoint with the installation id", async () => {
+    const request = vi.fn(async () => ({ data: {} }));
+
+    await uninstallInstallationWith({ request }, 149148749);
+
+    expect(request).toHaveBeenCalledWith(
+      "DELETE /app/installations/{installation_id}",
+      expect.objectContaining({ installation_id: 149148749 }),
     );
   });
 });

@@ -34,6 +34,10 @@ export async function getHeaderData(session: Session): Promise<HeaderData> {
     token,
     githubRepo: user?.githubRepo ?? null,
     manageUrl: user?.githubRepo ? installUrl : undefined,
-    connectUrl: user?.githubRepo ? undefined : installUrl,
+    // Always set (not just when disconnected server-side): disconnecting is a
+    // client-side state flip in AvatarMenu, with no page reload, so the
+    // fallback empty state needs a connect link ready even while this
+    // server-rendered prop still reflects the pre-disconnect connected state.
+    connectUrl: installUrl,
   };
 }
