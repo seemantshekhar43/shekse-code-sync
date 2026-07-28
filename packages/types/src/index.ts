@@ -147,6 +147,7 @@ export const CalendarDaySubmission = z.object({
   id: z.string(),
   title: z.string(),
   level: Level,
+  synced: z.boolean(),
 });
 export type CalendarDaySubmission = z.infer<typeof CalendarDaySubmission>;
 

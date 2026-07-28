@@ -225,11 +225,16 @@ export default async function HomePage({
             </div>
             <RevisionQueueRail items={revisionQueue} />
             <div className="mt-4 rounded-card border border-green-soft bg-green-soft px-4 py-3.5">
-              <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-green">
-                AI Insight
+              <div className="mb-1.5 flex items-center gap-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-green">
+                  AI Insight
+                </span>
+                <span className="rounded-pill bg-surface px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.05em] text-muted">
+                  Coming soon
+                </span>
               </div>
               <p className="text-[13px] leading-relaxed text-ink">
-                Insights land here once the dedicated Insights screen ships (see the backlog).
+                AI-generated insights aren&apos;t enabled yet - check back soon.
               </p>
             </div>
           </div>
