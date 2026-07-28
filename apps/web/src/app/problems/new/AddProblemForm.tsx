@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { CodeEditor } from "../../CodeEditor";
 import { createSubmission } from "./actions";
 
-const platforms = ["leetcode", "neetcode", "manual"] as const;
+const platforms = ["leetcode", "manual"] as const;
 const levels = ["easy", "medium", "hard"] as const;
 const languages = ["java", "python", "typescript", "javascript", "cpp", "go"] as const;
 

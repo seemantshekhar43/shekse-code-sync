@@ -74,7 +74,6 @@ export function FilterBar({
         >
           <option value="">Platform: All</option>
           <option value="leetcode">LeetCode</option>
-          <option value="neetcode">NeetCode</option>
           <option value="manual">Manual</option>
         </select>
         <select

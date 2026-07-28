@@ -4,7 +4,7 @@
 
 ## Vision
 
-Every DSA problem you solve on LeetCode / NeetCode leaves a durable, enriched, revisitable trace — with effectively zero manual bookkeeping.
+Every DSA problem you solve on LeetCode leaves a durable, enriched, revisitable trace — with effectively zero manual bookkeeping.
 
 **Problem today:** solved problems vanish into platform history; solutions aren't version-controlled; patterns/weaknesses live only in your head; revision is ad-hoc; no single view of progress.
 
@@ -34,7 +34,7 @@ two-sum/
 
 | Field | Source | Notes |
 |---|---|---|
-| title, questionLink, platform, level | capture | platform = leetcode / neetcode / manual |
+| title, questionLink, platform, level | capture | platform = leetcode / manual |
 | tags, topics, companies, language | capture | tags/topics also AI-enriched; companies if available |
 | runtime, memory, status, solvedAt, attemptCount | capture | status = accepted / wrong / TLE |
 | isMarkedForRevision | user | revision flag |
@@ -63,7 +63,7 @@ Chosen over OAuth App / PAT for fine-grained, per-repo, revocable, short-lived t
 
 - **MVP** — plugin captures LeetCode → GitHub + DB; basic list dashboard; manual form.
 - **v1** — AI complexity/pattern/optimization; filterable dashboard; progress header & insight cards.
-- **v2** — revision banks, quiz mode, spaced repetition, weakness targeting, NeetCode + more platforms.
+- **v2** — revision banks, quiz mode, spaced repetition, weakness targeting, more platforms.
 
 ## Risks
 

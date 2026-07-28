@@ -170,7 +170,7 @@ export default async function ProblemsPage({
                         </span>
                       </td>
                       <td className="border-b border-border py-3 pr-3.5 text-[12.5px] text-muted">
-                        {s.platform === "leetcode" ? "LeetCode" : s.platform === "neetcode" ? "NeetCode" : "Manual"}
+                        {s.platform === "leetcode" ? "LeetCode" : "Manual"}
                       </td>
                       <td className="border-b border-border py-3 pr-3.5">
                         <span

@@ -4,7 +4,7 @@ Project context and the working pattern to follow. (Also readable as `AGENTS.md`
 
 ## What this project is
 
-ShekseCodeSync captures every DSA problem solved on LeetCode / NeetCode, version-controls the question + solution in GitHub, enriches it with AI, and drives a revision engine and insights dashboard. See `docs/` for the full context:
+ShekseCodeSync captures every DSA problem solved on LeetCode, version-controls the question + solution in GitHub, enriches it with AI, and drives a revision engine and insights dashboard. See `docs/` for the full context:
 
 - `docs/PRD.md` — product requirements (vision, pillars, data model, roadmap, auth).
 - `docs/TECH_STACK.md` — the chosen stack and monorepo shape.

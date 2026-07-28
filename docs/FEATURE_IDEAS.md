@@ -13,7 +13,7 @@ Each idea notes: what it is · why it serves the goal · rough data/impl shape �
 Two audiences, and they're mostly the same person:
 
 - **You, getting better** — the product should actively *train pattern recognition* and *close weaknesses*, not just record what you already did. Recording is table stakes; the differentiator is the feedback loop.
-- **Other people adopting it** — adoption comes from (1) zero-effort capture (already the thesis), (2) recognizable curated sheets people already trust (Blind 75, NeetCode 150, Striver), and (3) a shareable portfolio that makes the tool feel worth keeping.
+- **Other people adopting it** — adoption comes from (1) zero-effort capture (already the thesis), (2) recognizable curated sheets people already trust (Blind 75, Striver), and (3) a shareable portfolio that makes the tool feel worth keeping.
 
 Design principle to hold: **every feature should either capture effortlessly, or force active recall.** Passive dashboards look nice but don't build skill. The revision/quiz/pattern-drill surfaces are where the actual skill gain lives.
 
@@ -27,7 +27,6 @@ The idea: ship a catalog of the well-known lists, auto-match them against what y
 Ship a curated, versioned catalog of famous sheets as static seed data in the repo (so it's diffable and self-hostable, consistent with "GitHub is source of truth"):
 
 - **Blind 75**
-- **NeetCode 150** (and NeetCode 250 / the roadmap ordering)
 - **Grind 75 / Grind 169** (with its week-by-week schedule — that schedule is itself a feature, see A5)
 - **Striver's SDE Sheet** and **Striver A2Z DSA** (huge in the India/LeetCode crowd)
 - **LeetCode Top Interview 150** / **Top 100 Liked**
@@ -46,7 +45,7 @@ SheetProblem  { id, sheetId, order, section, canonicalSlug, title, level, patter
 ### A2. Auto-match solved → sheet progress — **M**
 When a submission lands (or on a reconcile pass), match its normalized slug against `SheetProblem.canonicalSlug`. Then every sheet has live progress for free: "**47 / 75** Blind 75 · 12 easy / 28 med / 7 hard done." No manual ticking — this is the zero-effort thesis applied to sheets.
 
-Edge: slug normalization (leetcode.com/problems/two-sum vs neetcode links vs renamed problems). Keep an alias map in the seed data for the few that drift.
+Edge: slug normalization (leetcode.com/problems/two-sum variants vs renamed problems). Keep an alias map in the seed data for the few that drift.
 
 ### A3. Sheet progress dashboard — **M**
 A **Sheets** screen (new top-nav item next to Overview/Problems/Revision/Insights): one card per sheet with a completion ring, difficulty split, and "next unsolved" CTA. Drill into a sheet → the ordered checklist, each row linking to either your solved solution (GitHub) or the problem (if unsolved). Uses the locked axi.md tokens; completion ring in green accent.
