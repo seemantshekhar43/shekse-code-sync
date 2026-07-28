@@ -161,3 +161,18 @@ Designed in a lavish session (`.lavish/deployment-topology.html`, gitignored wor
 | 64 | CORS on `api` to be scoped to the extension's real origins | `app.enableCors()` in `apps/api/src/main.ts` is currently allow-all; tighten to `chrome-extension://<id>`/`moz-extension://<id>` once the published extension ID is stable (tracked in the deployment checklist, not yet implemented) | The extension is the only real cross-origin caller of `api`; auth is a bearer JWT not a cookie so allow-all isn't a security hole today, but scoping it is still the right prod posture |
 | 65 | Prod GitHub OAuth App + GitHub App registered separately from local dev | New credentials at prod callback/Setup URLs, stored as Vercel env vars (`web`) and the homelab `.env` (`api`) - never reuse dev credentials | Keeps prod secrets isolated from whatever's used for local development |
 | 66 | Postgres backups: two copies | Nightly dump to the HDD attached to the homelab, plus an off-site copy to Google Drive | Matches the pattern the user already runs for other self-hosted DBs |
+
+## 2026-07-28 - Docker stack validation (issue #32)
+
+`docker compose up --build` had never been exercised end-to-end; running it surfaced 4 real bugs, fixed on `apps/api/Dockerfile`, `apps/worker/Dockerfile`, and `docker-compose.yml`.
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 67 | api/worker containers run TS via `@swc-node/register`, not `tsx` | `CMD` switched to `node --import @swc-node/register/esm-register src/main.ts` | `tsx` isn't installed anywhere in the repo; local dev already runs `@swc-node/register` via `pnpm dev`, so the container now matches the same runtime instead of depending on an uninstalled tool |
+| 68 | `web`'s Dockerfile installs `openssl` before `pnpm --filter @scs/db generate` | Same `apt-get install -y openssl ca-certificates` step `api`/`worker` already had | Prisma's `generate` picks its query-engine binary based on the OpenSSL variant present at generate time; without it, the engine built couldn't find `libssl` at container runtime |
+| 69 | `web`'s compose service gets its own `DATABASE_URL` pointed at the `postgres` service | Added to `docker-compose.yml`'s `web` environment, matching `api`/`worker` | `web`'s `auth.ts` queries Prisma directly for the NextAuth user upsert; without this it silently fell back to `.env`'s localhost value, which doesn't resolve inside the container |
+| 70 | `web`'s compose service sets `AUTH_TRUST_HOST: "true"` | Added to `docker-compose.yml`'s `web` environment | `next start` runs Auth.js in production mode, which requires explicit trust of the request `Host` header; `next dev` trusts localhost implicitly, so this only surfaced once containerized |
+
+Verified by building and running all 5 services, signing in through real GitHub OAuth against the containerized `web` app, and driving a real Add-problem capture through `api` -> `postgres` -> `redis` -> `worker` end to end via `chrome-devtools-axi`.
+
+Also noted, not fixed (a local machine constraint, not a repo bug): `docker compose build` must run per-service rather than for the whole stack at once, since building `api`/`worker`/`web` concurrently OOMs a Docker Desktop VM with ~2GB allocated.
