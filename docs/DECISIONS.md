@@ -176,3 +176,14 @@ Designed in a lavish session (`.lavish/deployment-topology.html`, gitignored wor
 Verified by building and running all 5 services, signing in through real GitHub OAuth against the containerized `web` app, and driving a real Add-problem capture through `api` -> `postgres` -> `redis` -> `worker` end to end via `chrome-devtools-axi`.
 
 Also noted, not fixed (a local machine constraint, not a repo bug): `docker compose build` must run per-service rather than for the whole stack at once, since building `api`/`worker`/`web` concurrently OOMs a Docker Desktop VM with ~2GB allocated.
+
+## 2026-07-28 - CI image-build workflow, GHCR, and branch protection (issue #58)
+
+Follow-up from the deployment-topology checklist (`.lavish/deployment-topology.html`).
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 71 | New `.github/workflows/build-images.yml`, separate from `ci.yml` | Matrix build over `[api, worker]`, triggers only on push to `main`, pushes to `ghcr.io/<owner>/scs-api` and `scs-worker` tagged `latest` + long commit SHA | Keeps the existing PR-time `ci.yml` (typecheck/lint/test) untouched and fast; image builds only need to run on merge, not every PR push |
+| 72 | `docker-compose.yml`'s `api`/`worker` services gained an `image:` key alongside their existing `build:` key | `image: ghcr.io/seemantshekhar43/scs-api:latest` (and `scs-worker`) | `docker compose pull` needs a named image to pull; `build:` alone only supports local building. Keeping both means local dev still builds from source (`docker compose up --build`) while the homelab can just `docker compose pull && docker compose up -d` |
+| 73 | Branch protection on `main` not applied | Attempted via `gh-axi api PUT .../branches/main/protection`, got `403 Insufficient permissions` | Classic branch protection rules on a **private** repo require GitHub Pro/Team; this repo is on a free personal-account plan. Tracked as blocked in `PRODUCTION_CHECKLIST.local.md` - revisit if the repo goes public or the plan is upgraded |
+| 74 | Homelab pull step documented in README, not scripted | New "Deploying `api`/`worker`" section in `README.md`: `docker compose pull api worker && docker compose up -d api worker` | Matches the project's "start simple, automate only if it becomes friction" convention from the deployment-topology decision; no Watchtower or auto-deploy agent added |
