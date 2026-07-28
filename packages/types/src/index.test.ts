@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { CaptureSubmission, SubmissionQuery } from "./index.js";
+import { CaptureSubmission, Platform, SubmissionQuery } from "./index.js";
+
+describe("Platform", () => {
+  it("only allows leetcode and manual", () => {
+    expect(Platform.options).toEqual(["leetcode", "manual"]);
+  });
+
+  it("rejects neetcode now that it has been descoped", () => {
+    expect(() => Platform.parse("neetcode")).toThrow();
+  });
+});
 
 describe("CaptureSubmission", () => {
   it("parses a valid submission and defaults empty arrays", () => {
