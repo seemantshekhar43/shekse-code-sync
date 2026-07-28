@@ -1,16 +1,24 @@
+import { prisma } from "@scs/db";
 import { jwtVerify, SignJWT } from "jose";
 
 /**
  * Mint a ShekseCodeSync token for the extension: a JWT carrying the user's id
- * as `sub`, signed HS256 with the shared `SCS_TOKEN_SECRET`. Long-lived because
- * it is pasted into the extension; revocation is by rotating the secret.
+ * as `sub` and their current `ver` (token version), signed HS256 with the
+ * shared `SCS_TOKEN_SECRET`. Long-lived because it is pasted into the
+ * extension; the API checks `ver` against the user's stored `tokenVersion` on
+ * every request, so bumping that field (e.g. on disconnect) revokes every
+ * previously-minted token without needing to rotate the shared secret.
  */
 export async function mintScsToken(userId: string): Promise<string> {
   const secret = process.env.SCS_TOKEN_SECRET;
   if (!secret) {
     throw new Error("SCS_TOKEN_SECRET is not set");
   }
-  return new SignJWT({})
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: { tokenVersion: true },
+  });
+  return new SignJWT({ ver: user.tokenVersion })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt()

@@ -42,8 +42,10 @@ model User {
   // GitHub App install + repo this user syncs to
   githubInstallationId String?
   githubRepo           String?
-  submissions          Submission[]
-  createdAt            DateTime     @default(now()) @map("created_at")
+  // Bumped to invalidate previously-issued extension tokens (e.g. on disconnect).
+  tokenVersion Int          @default(0) @map("token_version")
+  submissions  Submission[]
+  createdAt    DateTime     @default(now()) @map("created_at")
 }
 
 model Submission {

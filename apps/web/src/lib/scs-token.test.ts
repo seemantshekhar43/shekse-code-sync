@@ -1,4 +1,9 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+
+vi.mock("@scs/db", () => ({
+  prisma: { user: { findUniqueOrThrow: vi.fn().mockResolvedValue({ tokenVersion: 0 }) } },
+}));
+
 import { mintInstallState, mintScsToken, verifyInstallState } from "./scs-token.js";
 
 beforeAll(() => {

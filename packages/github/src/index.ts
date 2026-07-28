@@ -123,6 +123,31 @@ export async function getInstallationAccount(
   return getInstallationAccountWith(octokit, installationId);
 }
 
+/**
+ * Uninstall a GitHub App installation, using the given app-authenticated
+ * octokit client. Calls the APP-level endpoint, so the client must be the
+ * App's own (JWT) octokit, not an installation-scoped one.
+ */
+export async function uninstallInstallationWith(
+  octokit: OctokitLike,
+  installationId: number,
+): Promise<void> {
+  await octokit.request("DELETE /app/installations/{installation_id}", {
+    installation_id: installationId,
+  });
+}
+
+/**
+ * Revoke a user's GitHub App installation entirely, so it no longer shows up
+ * under their GitHub account. Used by the disconnect flow; callers should
+ * treat a failure here as best-effort and still clear their own stored
+ * association, since GitHub may have already dropped the installation.
+ */
+export async function uninstallInstallation(installationId: number): Promise<void> {
+  const octokit = getApp().octokit as unknown as OctokitLike;
+  await uninstallInstallationWith(octokit, installationId);
+}
+
 /** Split a stored `"owner/repo"` string into its parts. */
 export function parseRepo(full: string): { owner: string; repo: string } {
   const [owner, repo, ...rest] = full.split("/");

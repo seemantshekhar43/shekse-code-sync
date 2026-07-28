@@ -138,3 +138,13 @@ Built the `/insights` screen signed off in lavish (`.lavish/insights-screen.html
 | 55 | Difficulty mix stays a bar chart with direct text labels, not a pie/donut | Ran the locked green/amber/red difficulty palette through the dataviz skill's colorblind validator - came back borderline (red/amber normal-vision floor just under threshold) | A donut is the wrong form for comparing close values regardless; bar + labels mitigates the borderline contrast without touching the locked tokens (docs/DESIGN.md) |
 | 56 | AI-insight bullets are rule-based, not LLM-generated, for this issue | `apps/web/src/lib/insights-observations.ts`; LLM-generated version filed as a follow-up (#51, needs a caching strategy to avoid a live model call per page view) | User was asked directly and chose rule-based now to keep #42 scoped and avoid the caching problem |
 | 57 | Streaks computed over all-time data, independent of the viewed `?year=` | `InsightsService` in `apps/api/src/insights/insights.service.ts` | A streak that reset at a year boundary would misrepresent an actual ongoing streak spanning New Year's |
+
+## 2026-07-28 - Disconnect GitHub action (issue #47)
+
+Added the danger-zone "Disconnect" action deferred out of #43/#48, signed off in lavish (`.lavish/disconnect-github.html`).
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 58 | "Disconnect" clears our DB association AND best-effort revokes the GitHub App installation | `disconnectInstallation()` in `apps/web/src/lib/github-install.ts` calls the new `uninstallInstallation()` in `packages/github`, then nulls `githubInstallationId`/`githubRepo` regardless of whether the GitHub call succeeded | User confirmed in lavish review; the DB write is the source of truth so a revoke failure (already uninstalled, transient error) never blocks the local disconnect |
+| 59 | Inline confirmation row instead of a modal | `AvatarMenu.tsx` swaps the GitHub-repo section into a Cancel/Disconnect row on click, no dialog component | No modal component exists anywhere in the codebase yet; user confirmed in lavish review that building one wasn't worth it for a single confirmation |
+| 60 | Disconnect also invalidates the extension token | Added `User.tokenVersion` (default 0); `mintScsToken` embeds it as the `ver` claim, `verifyScsToken` (apps/api) now checks it against the DB, and `disconnectInstallation` increments it | User asked mid-implementation: the extension token was a stateless, non-revocable 365-day JWT (revocation was "rotate the shared secret" for everyone) - a per-user version claim makes disconnect actually invalidate the specific token without touching anyone else's |

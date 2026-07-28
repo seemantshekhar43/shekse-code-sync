@@ -11,6 +11,7 @@ export function AvatarMenu({
   connectUrl,
   token,
   signOutAction,
+  disconnectAction,
 }: {
   displayName: string;
   githubHandle: string | null;
@@ -19,9 +20,13 @@ export function AvatarMenu({
   connectUrl?: string;
   token: string;
   signOutAction: () => Promise<void>;
+  disconnectAction: () => Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [confirmingDisconnect, setConfirmingDisconnect] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
+  const [disconnected, setDisconnected] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,6 +46,17 @@ export function AvatarMenu({
       setTimeout(() => setCopied(false), 1500);
     } catch {
       // Clipboard blocked - the user can still select the field manually.
+    }
+  }
+
+  async function confirmDisconnect() {
+    setDisconnecting(true);
+    try {
+      await disconnectAction();
+      setDisconnected(true);
+      setConfirmingDisconnect(false);
+    } finally {
+      setDisconnecting(false);
     }
   }
 
@@ -76,18 +92,54 @@ export function AvatarMenu({
             <h4 className="mb-2 text-[10.5px] font-semibold uppercase tracking-[0.11em] text-faint">
               GitHub repo
             </h4>
-            {githubRepo ? (
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-1.5">
-                  <span className="h-[6px] w-[6px] flex-none rounded-full bg-green" />
-                  <span className="truncate font-mono text-xs font-medium">{githubRepo}</span>
+            {githubRepo && !disconnected ? (
+              confirmingDisconnect ? (
+                <div className="flex flex-col gap-2.5">
+                  <p className="text-xs text-ink">
+                    Disconnect <span className="font-mono font-semibold">{githubRepo}</span>? Captures
+                    will stop syncing until you reconnect.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingDisconnect(false)}
+                      disabled={disconnecting}
+                      className="rounded-btn border border-border bg-surface-2 px-2.5 py-1.5 text-xs font-semibold text-ink disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={confirmDisconnect}
+                      disabled={disconnecting}
+                      className="rounded-btn bg-hard px-2.5 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                    >
+                      {disconnecting ? "Disconnecting..." : "Disconnect"}
+                    </button>
+                  </div>
                 </div>
-                {manageUrl ? (
-                  <a href={manageUrl} className="flex-none text-xs font-semibold text-green">
-                    Manage
-                  </a>
-                ) : null}
-              </div>
+              ) : (
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    <span className="h-[6px] w-[6px] flex-none rounded-full bg-green" />
+                    <span className="truncate font-mono text-xs font-medium">{githubRepo}</span>
+                  </div>
+                  <div className="flex gap-4">
+                    {manageUrl ? (
+                      <a href={manageUrl} className="text-xs font-semibold text-green">
+                        Manage
+                      </a>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingDisconnect(true)}
+                      className="text-xs font-semibold text-hard"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                </div>
+              )
             ) : (
               <div>
                 <p className="mb-2 text-xs text-muted">

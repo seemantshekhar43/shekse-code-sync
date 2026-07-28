@@ -3,6 +3,7 @@ import {
   getInstallationAccount,
   type InstallationRepo,
   listInstallationRepos,
+  uninstallInstallation,
 } from "@scs/github";
 import { verifyInstallState } from "./scs-token";
 
@@ -20,6 +21,38 @@ export async function persistInstallation(
     data: {
       githubInstallationId: String(installationId),
       githubRepo: fullName,
+    },
+  });
+}
+
+/**
+ * Disconnect a user's GitHub App installation: best-effort revoke it on
+ * GitHub, then clear the stored association regardless of whether the revoke
+ * succeeded (the installation may already be gone on GitHub's side). Our DB
+ * is the source of whether the user is "connected". Also bumps `tokenVersion`
+ * so every previously-minted extension token is invalidated - a fresh one is
+ * only handed out the next time this user's session mints one.
+ */
+export async function disconnectInstallation(userId: string): Promise<void> {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: { githubInstallationId: true },
+  });
+
+  if (user.githubInstallationId) {
+    try {
+      await uninstallInstallation(Number(user.githubInstallationId));
+    } catch {
+      // Best-effort: the installation may already be gone on GitHub's side.
+    }
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      githubInstallationId: null,
+      githubRepo: null,
+      tokenVersion: { increment: 1 },
     },
   });
 }
