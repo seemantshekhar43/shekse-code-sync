@@ -45,3 +45,20 @@ jobs:
           package-name: scs-${{ matrix.service }}
           package-type: container
           min-versions-to-keep: 3
+
+  build-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @scs/extension zip
+      - run: mv apps/extension/.output/*-chrome.zip scs-extension-latest.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension-zip
+          path: scs-extension-latest.zip
