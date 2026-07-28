@@ -12,6 +12,7 @@ export function AvatarMenu({
   token,
   signOutAction,
   disconnectAction,
+  mintTokenAction,
 }: {
   displayName: string;
   githubHandle: string | null;
@@ -21,12 +22,14 @@ export function AvatarMenu({
   token: string;
   signOutAction: () => Promise<void>;
   disconnectAction: () => Promise<void>;
+  mintTokenAction: () => Promise<string>;
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [confirmingDisconnect, setConfirmingDisconnect] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
+  const [displayToken, setDisplayToken] = useState(token);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,7 +44,7 @@ export function AvatarMenu({
 
   async function copyToken() {
     try {
-      await navigator.clipboard.writeText(token);
+      await navigator.clipboard.writeText(displayToken);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -53,6 +56,8 @@ export function AvatarMenu({
     setDisconnecting(true);
     try {
       await disconnectAction();
+      const freshToken = await mintTokenAction();
+      setDisplayToken(freshToken);
       setDisconnected(true);
       setConfirmingDisconnect(false);
     } finally {
@@ -167,7 +172,7 @@ export function AvatarMenu({
             <div className="flex gap-1.5">
               <input
                 readOnly
-                value={token}
+                value={displayToken}
                 onFocus={(e) => e.currentTarget.select()}
                 className="min-w-0 flex-1 rounded-card border border-border bg-surface px-2 py-1.5 font-mono text-[11.5px] text-muted"
               />
