@@ -69,7 +69,7 @@ pnpm dev                           # runs web, api, worker together via Turborep
 
 - Dashboard: http://localhost:3000
 - API: http://localhost:3001
-- Extension: `pnpm --filter @scs/extension dev`, then load the unpacked build in your browser
+- Extension (dev): `pnpm --filter @scs/extension dev`, then load the unpacked build in your browser. See "Installing the extension" below for a packaged build instead.
 
 `.env.example` documents every variable, including how to register the GitHub OAuth App and GitHub App the login and repo-write flows need. `pnpm test`, `pnpm typecheck`, and `pnpm lint` run across the whole workspace.
 
@@ -133,6 +133,18 @@ docker compose up -d api worker
 ```
 
 This is a manual step by design (start simple, automate only if it becomes friction) - no auto-deploy agent like Watchtower is running.
+
+## Installing the extension
+
+Not yet on the Chrome Web Store - for now, install the packaged build from GitHub Releases:
+
+1. Grab `scs-extension-<version>.zip` from the [latest release](https://github.com/seemantshekhar43/shekse-code-sync/releases/latest) and unzip it. (A build off the tip of `main`, not yet tagged, is available as the `extension-zip` workflow artifact on the latest successful [Build images](https://github.com/seemantshekhar43/shekse-code-sync/actions/workflows/build-images.yml) run.)
+2. In Chrome (or another Chromium browser), go to `chrome://extensions`.
+3. Enable **Developer mode** (top right).
+4. Click **Load unpacked** and select the unzipped folder.
+5. Pin the extension, open the popup, and paste in your ShekseCodeSync token (from the dashboard's avatar menu) to connect it to your account.
+
+Because this isn't a store install, updates aren't automatic - repeat these steps with the newer zip when a new version ships.
 
 ## Contributing
 
