@@ -49,7 +49,7 @@ export function AddProblemForm() {
 
   return (
     <form action={handleSubmit}>
-      <div className="grid grid-cols-1 gap-4 px-6 pb-1 pt-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 pb-1 pt-6 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5 sm:col-span-2">
           <label className="text-[11.5px] font-bold uppercase tracking-[0.08em] text-muted">
             Title
@@ -200,12 +200,12 @@ export function AddProblemForm() {
       </div>
 
       {error ? (
-        <p className="mx-6 mt-4 rounded-card border border-hard/30 bg-hard/10 px-3.5 py-2.5 text-[12.5px] text-hard">
+        <p className="mt-4 rounded-card border border-hard/30 bg-hard/10 px-3.5 py-2.5 text-[12.5px] text-hard">
           {error}
         </p>
       ) : null}
 
-      <div className="mt-6 flex items-center justify-between border-t border-border px-6 py-5">
+      <div className="mt-6 flex items-center justify-between border-t border-border py-5">
         <p className="text-[11.5px] text-faint">
           Submits as a CaptureSubmission to the same POST /submissions the extension uses.
         </p>
