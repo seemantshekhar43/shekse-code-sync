@@ -24,10 +24,11 @@ export default async function SubmissionCodePage({ params }: { params: { id: str
   if (!result) notFound();
 
   return (
-    <main className="mx-auto max-w-5xl px-8 py-12">
-      <div className="rounded-shell border border-border bg-paper shadow-shell">
-        <DashboardHeader active="/problems" {...headerData} />
-        <div className="flex items-center justify-between px-6 pb-1 pt-6">
+    <main className="min-h-screen bg-paper">
+      <DashboardHeader active="/problems" {...headerData} />
+
+      <div className="mx-auto max-w-5xl px-6 py-8">
+        <div className="flex items-center justify-between pb-1">
           <div>
             <a href="/problems" className="text-xs font-medium text-muted hover:text-green">
               &larr; Back to Problems
@@ -40,7 +41,7 @@ export default async function SubmissionCodePage({ params }: { params: { id: str
         </div>
 
         {result.analysis ? (
-          <div className="flex gap-3 px-6 pt-4">
+          <div className="flex gap-3 pt-4">
             <div className="rounded-card border border-border bg-surface px-3.5 py-2.5">
               <div className="text-[10.5px] font-semibold uppercase tracking-[0.09em] text-faint">
                 Time complexity
@@ -59,12 +60,12 @@ export default async function SubmissionCodePage({ params }: { params: { id: str
             </div>
           </div>
         ) : (
-          <p className="px-6 pt-4 text-[11.5px] italic text-faint">
+          <p className="pt-4 text-[11.5px] italic text-faint">
             AI complexity analysis hasn&apos;t finished yet - check back shortly.
           </p>
         )}
 
-        <div className="px-6 pb-7 pt-4">
+        <div className="pt-4">
           <div className="mb-2 flex justify-end">
             <CopyCodeButton code={result.code} />
           </div>
