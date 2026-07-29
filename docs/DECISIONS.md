@@ -219,7 +219,7 @@ Prerequisite for the Vercel migration in the production-deployment checklist. Su
 |---|---|---|---|
 | 83 | Package the built extension and attach it to GitHub Releases and main-branch build artifacts, mirroring the api/worker image pattern; Chrome Web Store publishing deferred | `build-extension` job added to `release.yml` (attaches `scs-extension-<tag>.zip` to the tagged Release) and to `build-images.yml` (uploads `extension-zip` as a workflow artifact on every push to `main`); README gained an "Installing the extension" section | Closes a real distribution gap - previously only a dev workflow (`pnpm dev` + load unpacked) was documented. Chrome Web Store needs a developer fee and Google review, so it's deferred and tracked separately rather than blocking this fix |
 
-## 2026-07-29 — In-dashboard extension download + install guide (issue #70)
+## 2026-07-29 - In-dashboard extension download + install guide (issue #70)
 
 Placement and visual treatment decided in a lavish design session over 3 candidate locations (dedicated page / AvatarMenu section / Overview card); user picked a dedicated page.
 
@@ -228,3 +228,9 @@ Placement and visual treatment decided in a lavish design session over 3 candida
 | 84 | New `/extension` dashboard page, added as a nav item in `DashboardHeader` | `apps/web/src/app/extension/page.tsx`, fetches the latest GitHub Release asset server-side (`apps/web/src/lib/extension-release.ts`) and renders the same 6-step install walkthrough as the README, styled with the locked design tokens | Most discoverable placement; room for the full illustrated guide without cramming it into the avatar dropdown |
 | 85 | Repo visibility changed from private to public; `main` branch protection added | `seemantshekhar43/shekse-code-sync` repo settings | The unauthenticated GitHub Releases API (used by decision #84's fetch, so the dashboard needs no extra GitHub token) returns 404 for a private repo; the README already described the project as open source (issues/PRs open to contributors), so this closes a gap between stated and actual visibility rather than introducing a new token/auth path |
 | 86 | `main` protection: require the `verify` CI check (strict, i.e. branch must be up to date), require a PR before merging (0 approvals - solo maintainer), no force pushes, no deletions; `enforce_admins: false` so the owner can still bypass in a genuine emergency | Set via `PUT /repos/.../branches/main/protection` | Unblocks decision #73 (`PRODUCTION_CHECKLIST.local.md` item), which was blocked because classic branch protection on a **private** repo needs GitHub Pro/Team - decision #85 making the repo public removed that constraint |
+
+## 2026-07-29 - Naming: keep ShekseCodeSync, lead the Store listing with "CodeSync" (issue #71)
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 87 | Repo, package names (`@scs/*`), and product name stay `ShekseCodeSync`/`shekse-code-sync`; only the Chrome Web Store listing title/description leads with "CodeSync" wording | No rename across the repo, packages, GitHub App, OAuth app, or DNS; store listing copy tracked as a comment on issue #71 | "CodeSync" alone is a common, crowded name (collision/dilution risk on the Store and in search); a full rename would touch package names, App registrations, and DNS for no benefit beyond the listing itself. The Store listing title is the actual SEO/first-impression surface, so that's the only place the more descriptive name needs to live |
