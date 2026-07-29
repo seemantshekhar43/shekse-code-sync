@@ -76,11 +76,11 @@ export default async function ProblemsPage({
   const sortColumns: Record<string, "title" | "solvedAt"> = { Problem: "title", Solved: "solvedAt" };
 
   return (
-    <main className="mx-auto max-w-5xl px-8 py-12">
-      <div className="rounded-shell border border-border bg-paper shadow-shell">
-        <DashboardHeader active="/problems" {...headerData} />
+    <main className="min-h-screen bg-paper">
+      <DashboardHeader active="/problems" {...headerData} />
 
-        <div className="flex items-end justify-between gap-4 px-6 pb-1 pt-8">
+      <div className="mx-auto max-w-5xl px-6 py-8">
+        <div className="flex items-end justify-between gap-4">
           <div>
             <div className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">
               All submissions
@@ -103,7 +103,7 @@ export default async function ProblemsPage({
 
         <FilterBar patterns={patterns} languages={languages} />
 
-        <div className="overflow-x-auto px-6 pb-2 pt-4">
+        <div className="overflow-x-auto pb-2 pt-4">
           {pageRows.length === 0 ? (
             <p className="rounded-card border border-dashed border-border p-10 text-center text-sm text-muted">
               {all.length === 0
@@ -222,7 +222,7 @@ export default async function ProblemsPage({
         </div>
 
         {filtered.length > 0 ? (
-          <div className="flex items-center justify-between px-6 pb-7 pt-3.5 text-[12.5px] text-muted">
+          <div className="flex items-center justify-between pb-7 pt-3.5 text-[12.5px] text-muted">
             <span>
               Showing {(currentPage - 1) * PAGE_SIZE + 1}-
               {Math.min(currentPage * PAGE_SIZE, filtered.length)} of {filtered.length}

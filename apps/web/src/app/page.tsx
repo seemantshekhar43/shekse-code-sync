@@ -94,64 +94,62 @@ export default async function HomePage({
   });
 
   return (
-    <main className="mx-auto max-w-5xl px-8 py-12">
-      <div className="rounded-shell border border-border bg-paper shadow-shell">
-        <DashboardHeader active="/" {...headerData} />
+    <main className="min-h-screen bg-paper">
+      <DashboardHeader active="/" {...headerData} />
 
-        <div className="px-6 pb-1 pt-8">
-          {banner ? (
-            <p
-              className={`mb-4 rounded-card border px-3 py-2 text-sm ${
-                banner.ok
-                  ? "border-green-soft bg-green-soft text-green"
-                  : "border-hard/20 bg-hard/10 text-hard"
-              }`}
-            >
-              {banner.text}
-            </p>
-          ) : null}
-          <div className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">
-            {today}
+      <div className="mx-auto max-w-5xl px-6 py-8">
+        {banner ? (
+          <p
+            className={`mb-4 rounded-card border px-3 py-2 text-sm ${
+              banner.ok
+                ? "border-green-soft bg-green-soft text-green"
+                : "border-hard/20 bg-hard/10 text-hard"
+            }`}
+          >
+            {banner.text}
+          </p>
+        ) : null}
+        <div className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-muted">
+          {today}
+        </div>
+        <h2 className="mb-5 font-serif text-[28px] font-semibold leading-tight">
+          You&apos;ve solved <span className="text-green">{submissions.length} problems</span>
+          {revisionQueue.length > 0 ? `, and ${revisionQueue.length} are due for revision.` : "."}
+        </h2>
+        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="rounded-card border border-border bg-surface px-4 py-4">
+            <div className="font-serif text-3xl font-semibold leading-none">
+              {submissions.length}
+            </div>
+            <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
+              Solved
+            </div>
           </div>
-          <h2 className="mb-5 font-serif text-[28px] font-semibold leading-tight">
-            You&apos;ve solved <span className="text-green">{submissions.length} problems</span>
-            {revisionQueue.length > 0 ? `, and ${revisionQueue.length} are due for revision.` : "."}
-          </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div className="rounded-card border border-border bg-surface px-4 py-4">
-              <div className="font-serif text-3xl font-semibold leading-none">
-                {submissions.length}
-              </div>
-              <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
-                Solved
-              </div>
+          <div className="rounded-card border border-border bg-surface px-4 py-4">
+            <div className="font-serif text-3xl font-semibold leading-none">{streak}</div>
+            <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
+              Day streak
             </div>
-            <div className="rounded-card border border-border bg-surface px-4 py-4">
-              <div className="font-serif text-3xl font-semibold leading-none">{streak}</div>
-              <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
-                Day streak
-              </div>
+          </div>
+          <div className="rounded-card border border-border bg-surface px-4 py-4">
+            <div className="font-serif text-3xl font-semibold leading-none">
+              {patterns.size}
             </div>
-            <div className="rounded-card border border-border bg-surface px-4 py-4">
-              <div className="font-serif text-3xl font-semibold leading-none">
-                {patterns.size}
-              </div>
-              <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
-                Patterns
-              </div>
+            <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
+              Patterns
             </div>
-            <div className="rounded-card border border-border bg-surface px-4 py-4">
-              <div className="font-serif text-3xl font-semibold leading-none text-medium">
-                {revisionQueue.length}
-              </div>
-              <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
-                Due today
-              </div>
+          </div>
+          <div className="rounded-card border border-border bg-surface px-4 py-4">
+            <div className="font-serif text-3xl font-semibold leading-none text-medium">
+              {revisionQueue.length}
+            </div>
+            <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-muted">
+              Due today
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 px-6 pb-7 pt-6 md:grid-cols-[1fr_300px]">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-[1fr_300px]">
           <div>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="font-serif text-lg font-semibold">Recent submissions</h3>
@@ -243,3 +241,5 @@ export default async function HomePage({
     </main>
   );
 }
+
+
