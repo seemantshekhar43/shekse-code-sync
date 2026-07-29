@@ -12,11 +12,11 @@ export default defineConfig({
     },
     permissions: ["storage", "tabs"],
     // leetcode.com: content-script GraphQL pull. localhost: dev API POST.
-    // api.codesync.shekse.com: prod API host, once DNS/deploy is live.
+    // api-codesync.shekse.com: prod API host, live via a Cloudflare Tunnel.
     host_permissions: [
       "https://leetcode.com/*",
       "http://localhost:3001/*",
-      "https://api.codesync.shekse.com/*",
+      "https://api-codesync.shekse.com/*",
     ],
   },
 });
