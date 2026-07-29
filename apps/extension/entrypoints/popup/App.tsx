@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { browser } from "wxt/browser";
 import { postCapture } from "../../lib/api.js";
 import { slugFromUrl } from "../../lib/leetcode.js";
-import { CAPTURE_REQUEST, type CaptureResponse } from "../../lib/messages.js";
+import {
+  CAPTURE_REQUEST,
+  isMissingContentScriptError,
+  type CaptureResponse,
+} from "../../lib/messages.js";
 import { DEFAULT_SETTINGS, getSettings, saveSettings, type Settings } from "../../lib/settings.js";
 import "./popup.css";
 
@@ -33,10 +37,22 @@ export function App() {
         setResult({ kind: "err", text: "Open a LeetCode problem page, then try again." });
         return;
       }
-      const response = (await browser.tabs.sendMessage(tab.id, {
-        type: CAPTURE_REQUEST,
-        slug: currentSlug,
-      })) as CaptureResponse;
+      let response: CaptureResponse;
+      try {
+        response = (await browser.tabs.sendMessage(tab.id, {
+          type: CAPTURE_REQUEST,
+          slug: currentSlug,
+        })) as CaptureResponse;
+      } catch (err) {
+        if (isMissingContentScriptError(err)) {
+          setResult({
+            kind: "err",
+            text: "Couldn't reach the LeetCode tab - reload the page and try again.",
+          });
+          return;
+        }
+        throw err;
+      }
       if (!response?.ok) {
         setResult({ kind: "err", text: response?.error ?? "Could not read the submission." });
         return;
