@@ -5,9 +5,18 @@ export default defineConfig({
   manifest: {
     name: "ShekseCodeSync",
     description: "Capture your LeetCode submissions to ShekseCodeSync.",
+    icons: {
+      16: "icon/16.png",
+      48: "icon/48.png",
+      128: "icon/128.png",
+    },
     permissions: ["storage", "tabs"],
     // leetcode.com: content-script GraphQL pull. localhost: dev API POST.
-    // Point the popup's API URL elsewhere and add that host here to deploy.
-    host_permissions: ["https://leetcode.com/*", "http://localhost:3001/*"],
+    // api.codesync.shekse.com: prod API host, once DNS/deploy is live.
+    host_permissions: [
+      "https://leetcode.com/*",
+      "http://localhost:3001/*",
+      "https://api.codesync.shekse.com/*",
+    ],
   },
 });
