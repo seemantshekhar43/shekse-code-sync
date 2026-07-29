@@ -48,7 +48,7 @@ Difficulty encoding: Easy = green, Medium = amber (`medium`), Hard = red (`hard`
 ## Surfaces
 
 - **Plugin popup (~360px):** paper shell, serif wordmark + green status dot, one "accepted submission" card (title, difficulty/pattern/language badges, runtime/memory metrics), a single primary **Pull & Send to GitHub** action, a compact recent-syncs list, and a footer linking to the dashboard/settings. Compact, single primary action, glanceable status.
-- **Web dashboard:** serif wordmark + text nav (Overview / Problems / Revision / Insights) + avatar; a serif headline that states the day's story; a 4-up stats row (Solved / Streak / Patterns / Due today); a recent-submissions table (problem · difficulty · pattern · solved); and a right rail with the revision queue + an AI-insight card. GitHub sync status is **not** shown on the overview table - it belongs on the detailed problems grid.
+- **Web dashboard:** serif wordmark + text nav (Overview / Problems / Revision / Insights / Extension) + avatar; a serif headline that states the day's story; a 4-up stats row (Solved / Streak / Patterns / Due today); a recent-submissions table (problem · difficulty · pattern · solved); and a right rail with the revision queue + an AI-insight card. GitHub sync status is **not** shown on the overview table - it belongs on the detailed problems grid.
 
 ## Implementation notes
 

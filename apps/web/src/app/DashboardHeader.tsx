@@ -8,6 +8,7 @@ const navItems = [
   { href: "/problems", label: "Problems" },
   { href: "/revision", label: "Revision" },
   { href: "/insights", label: "Insights" },
+  { href: "/extension", label: "Extension" },
 ] as const;
 
 export function DashboardHeader({

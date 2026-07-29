@@ -218,3 +218,12 @@ Prerequisite for the Vercel migration in the production-deployment checklist. Su
 | # | Decision | Choice | Why |
 |---|---|---|---|
 | 83 | Package the built extension and attach it to GitHub Releases and main-branch build artifacts, mirroring the api/worker image pattern; Chrome Web Store publishing deferred | `build-extension` job added to `release.yml` (attaches `scs-extension-<tag>.zip` to the tagged Release) and to `build-images.yml` (uploads `extension-zip` as a workflow artifact on every push to `main`); README gained an "Installing the extension" section | Closes a real distribution gap - previously only a dev workflow (`pnpm dev` + load unpacked) was documented. Chrome Web Store needs a developer fee and Google review, so it's deferred and tracked separately rather than blocking this fix |
+
+## 2026-07-29 — In-dashboard extension download + install guide (issue #70)
+
+Placement and visual treatment decided in a lavish design session over 3 candidate locations (dedicated page / AvatarMenu section / Overview card); user picked a dedicated page.
+
+| # | Decision | Choice | Why |
+|---|---|---|---|
+| 84 | New `/extension` dashboard page, added as a nav item in `DashboardHeader` | `apps/web/src/app/extension/page.tsx`, fetches the latest GitHub Release asset server-side (`apps/web/src/lib/extension-release.ts`) and renders the same 6-step install walkthrough as the README, styled with the locked design tokens | Most discoverable placement; room for the full illustrated guide without cramming it into the avatar dropdown |
+| 85 | Repo visibility changed from private to public; `main` branch protection added | `seemantshekhar43/shekse-code-sync` repo settings | The unauthenticated GitHub Releases API (used by decision #84's fetch, so the dashboard needs no extra GitHub token) returns 404 for a private repo; the README already described the project as open source (issues/PRs open to contributors), so this closes a gap between stated and actual visibility rather than introducing a new token/auth path |
