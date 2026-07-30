@@ -90,7 +90,7 @@ export function App() {
             <input
               value={settings.apiBaseUrl}
               onChange={(e) => setSettings({ ...settings, apiBaseUrl: e.target.value })}
-              placeholder="http://localhost:3001"
+              placeholder={DEFAULT_SETTINGS.apiBaseUrl}
             />
           </label>
           <label>
