@@ -3,6 +3,7 @@ import { auth, signIn } from "../auth";
 import { getHeaderData } from "../lib/header-data";
 import { EXTENSION_STORE_URL } from "../lib/extension-links";
 import { pillClass, relativeSolved, safeHttpUrl } from "../lib/dashboard-format";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "../lib/site";
 import { getRevisionQueue } from "../lib/revisions-api";
 import { getSubmissions } from "../lib/submissions-api";
 import { DashboardHeader } from "./DashboardHeader";
@@ -71,6 +72,21 @@ export default async function HomePage({
 
     return (
       <main className="min-h-screen bg-paper">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: SITE_NAME,
+              description: SITE_DESCRIPTION,
+              url: SITE_URL,
+              applicationCategory: "DeveloperApplication",
+              operatingSystem: "Web",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            }),
+          }}
+        />
         <div className="mx-auto flex max-w-4xl flex-col items-start px-8 pb-16 pt-24">
           <div className="mb-2 flex items-center gap-2">
             <span className="h-[9px] w-[9px] rounded-full bg-green shadow-[0_0_0_3px_var(--green-soft)]" />
