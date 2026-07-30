@@ -71,12 +71,12 @@ export default async function HomePage({
 
     return (
       <main className="min-h-screen bg-paper">
-        <div className="mx-auto flex max-w-2xl flex-col items-start px-8 pb-16 pt-24">
+        <div className="mx-auto flex max-w-4xl flex-col items-start px-8 pb-16 pt-24">
           <div className="mb-2 flex items-center gap-2">
             <span className="h-[9px] w-[9px] rounded-full bg-green shadow-[0_0_0_3px_var(--green-soft)]" />
             <span className="font-serif text-base font-semibold">ShekseCodeSync</span>
           </div>
-          <h1 className="font-serif text-4xl font-semibold leading-tight tracking-tight">
+          <h1 className="max-w-2xl font-serif text-4xl font-semibold leading-tight tracking-tight">
             A quiet, typographic home for <span className="text-green">[every problem you solve]</span>.
           </h1>
           <p className="mt-3 max-w-md text-[17px] text-muted">
