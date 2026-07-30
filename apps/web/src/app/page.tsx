@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { auth, signIn } from "../auth";
 import { getHeaderData } from "../lib/header-data";
+import { EXTENSION_STORE_URL } from "../lib/extension-links";
 import { pillClass, relativeSolved, safeHttpUrl } from "../lib/dashboard-format";
 import { getRevisionQueue } from "../lib/revisions-api";
 import { getSubmissions } from "../lib/submissions-api";
@@ -114,6 +115,34 @@ export default async function HomePage({
               </div>
             </div>
           ))}
+
+          <div className="rounded-card border border-border bg-surface px-8 py-10 text-center">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[.12em] text-green">
+              Chrome extension
+            </p>
+            <h2 className="font-serif text-xl font-semibold">
+              One click on LeetCode, that&apos;s the whole workflow
+            </h2>
+            <p className="mx-auto mt-2 max-w-lg text-[15px] text-muted">
+              ShekseCodeSync is live on the Chrome Web Store. Install it, paste your account
+              token once, and every accepted submission commits itself to your GitHub repo.
+            </p>
+            <a
+              href={EXTENSION_STORE_URL}
+              className="mt-6 inline-block rounded-btn bg-green px-4 py-2.5 text-sm font-semibold text-white"
+            >
+              Add to Chrome
+            </a>
+            <div className="mx-auto mt-7 max-w-xl overflow-hidden rounded-card border border-border shadow-sm">
+              <Image
+                src="/marketing/extension-sync.png"
+                alt="ShekseCodeSync browser extension popup confirming a solved problem was sent to GitHub"
+                width={760}
+                height={560}
+                className="w-full"
+              />
+            </div>
+          </div>
         </div>
       </main>
     );
