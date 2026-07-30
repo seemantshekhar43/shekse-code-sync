@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 export function MobileNav({
@@ -41,7 +42,7 @@ export function MobileNav({
       {open ? (
         <div className="absolute left-0 top-[38px] z-10 w-44 rounded-shell border border-border bg-paper py-1.5 shadow-shell">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
@@ -50,7 +51,7 @@ export function MobileNav({
               }`}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </div>
       ) : null}

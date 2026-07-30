@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth, signOut } from "../auth";
 import { disconnectInstallation } from "../lib/github-install";
 import { mintScsToken } from "../lib/scs-token";
@@ -39,13 +40,13 @@ export function DashboardHeader({
         </div>
         <nav className="hidden gap-5 text-sm md:flex">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className={`font-medium ${item.href === active ? "text-ink" : "text-muted"}`}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
       </div>
