@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { auth, signIn } from "../auth";
 import { getHeaderData } from "../lib/header-data";
 import { pillClass, relativeSolved, safeHttpUrl } from "../lib/dashboard-format";
@@ -46,31 +47,74 @@ export default async function HomePage({
   const session = await auth();
 
   if (!session?.userId) {
+    const features: { title: string; body: string; image: string; alt: string }[] = [
+      {
+        title: "Every submission, captured automatically",
+        body: "Solve a problem on LeetCode and the browser extension commits the question and your accepted solution to your own GitHub repo - no copy-pasting, nothing left behind on the platform.",
+        image: "/marketing/overview.png",
+        alt: "Overview dashboard showing solved count, streak, and recent submissions",
+      },
+      {
+        title: "A revision queue that's honest about what you remember",
+        body: "Rate each problem Again, Hard, Good, or Easy and the spaced-repetition scheduler decides when you see it again - so recall is scheduled, not left to chance.",
+        image: "/marketing/revision.png",
+        alt: "Revision queue showing problems due for spaced-repetition review",
+      },
+      {
+        title: "See where your practice is actually going",
+        body: "Pattern coverage, difficulty mix, and solve streaks in one view, so you know what to drill next instead of guessing.",
+        image: "/marketing/insights.png",
+        alt: "Insights dashboard showing pattern coverage and difficulty mix",
+      },
+    ];
+
     return (
-      <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-8 py-24">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="h-[9px] w-[9px] rounded-full bg-green shadow-[0_0_0_3px_var(--green-soft)]" />
-          <span className="font-serif text-base font-semibold">ShekseCodeSync</span>
-        </div>
-        <h1 className="font-serif text-4xl font-semibold leading-tight tracking-tight">
-          A quiet, typographic home for <span className="text-green">[every problem you solve]</span>.
-        </h1>
-        <p className="mt-3 max-w-md text-[17px] text-muted">
-          Sign in to capture, revise, and see insights on your DSA practice.
-        </p>
-        <form
-          action={async () => {
-            "use server";
-            await signIn("github");
-          }}
-        >
-          <button
-            type="submit"
-            className="mt-8 rounded-btn bg-green px-4 py-3 text-sm font-semibold text-white"
+      <main className="min-h-screen bg-paper">
+        <div className="mx-auto flex max-w-2xl flex-col items-start px-8 pb-16 pt-24">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="h-[9px] w-[9px] rounded-full bg-green shadow-[0_0_0_3px_var(--green-soft)]" />
+            <span className="font-serif text-base font-semibold">ShekseCodeSync</span>
+          </div>
+          <h1 className="font-serif text-4xl font-semibold leading-tight tracking-tight">
+            A quiet, typographic home for <span className="text-green">[every problem you solve]</span>.
+          </h1>
+          <p className="mt-3 max-w-md text-[17px] text-muted">
+            Capture every LeetCode submission to your own GitHub repo, revise on a schedule instead
+            of never, and see the insights hiding in your practice history.
+          </p>
+          <form
+            action={async () => {
+              "use server";
+              await signIn("github");
+            }}
           >
-            Sign in with GitHub
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="mt-8 rounded-btn bg-green px-4 py-3 text-sm font-semibold text-white"
+            >
+              Sign in with GitHub
+            </button>
+          </form>
+        </div>
+
+        <div className="mx-auto flex max-w-4xl flex-col gap-16 px-8 pb-24">
+          {features.map((feature, index) => (
+            <div key={feature.title}>
+              <h2 className="font-serif text-xl font-semibold">{feature.title}</h2>
+              <p className="mt-2 max-w-2xl text-[15px] text-muted">{feature.body}</p>
+              <div className="mt-5 overflow-hidden rounded-card border border-border shadow-sm">
+                <Image
+                  src={feature.image}
+                  alt={feature.alt}
+                  width={1280}
+                  height={800}
+                  className="w-full"
+                  priority={index === 0}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </main>
     );
   }

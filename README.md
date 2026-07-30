@@ -6,6 +6,18 @@
 
 Every DSA problem you solve on LeetCode, automatically version-controlled in your own GitHub repo, enriched with AI analysis, and turned into a searchable dashboard with a spaced-repetition revision engine.
 
+## Screenshots
+
+![Overview dashboard](docs/images/overview.png)
+*Today's stats, recent submissions, and what's due for revision.*
+
+<p float="left">
+  <img src="docs/images/revision.png" width="49%" alt="Revision queue">
+  <img src="docs/images/insights.png" width="49%" alt="Insights dashboard">
+</p>
+
+*Spaced-repetition revision, rated honestly (left) and pattern/difficulty coverage over time (right).*
+
 ## The problem this solves
 
 If you practice data structures & algorithms regularly (interview prep, competitive programming, or just for fun), your solved problems end up scattered and disposable:
