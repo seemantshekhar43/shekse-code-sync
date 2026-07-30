@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { RevisionQueueItem } from "@scs/types";
 import { pillClass, safeHttpUrl } from "../../lib/dashboard-format";
 import type { RevisionSegments } from "../../lib/revision-segments";
+import { ConfirmDialog } from "../ConfirmDialog";
 import { recordRevisionAttempt, setRevisionFlag } from "../revision-actions";
 
 const ratings: { label: string; value: number; variant?: "again" | "hardish" }[] = [
@@ -29,6 +30,7 @@ function dueLabel(dueAt: Date | null, now: Date): { text: string; className: str
 function QueueCard({ item, now, borderClass }: { item: RevisionQueueItem; now: Date; borderClass: string }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
   const due = dueLabel(item.dueAt, now);
   const href = safeHttpUrl(item.questionLink);
 
@@ -45,6 +47,7 @@ function QueueCard({ item, now, borderClass }: { item: RevisionQueueItem; now: D
   }
 
   async function remove() {
+    setConfirmingRemove(false);
     setPending(true);
     setError(false);
     try {
@@ -108,21 +111,31 @@ function QueueCard({ item, now, borderClass }: { item: RevisionQueueItem; now: D
         <button
           type="button"
           disabled={pending}
-          onClick={remove}
+          onClick={() => setConfirmingRemove(true)}
           className="text-[10.5px] text-faint underline decoration-transparent hover:text-hard hover:decoration-hard disabled:opacity-50"
         >
           Remove from queue
         </button>
       </div>
+      <ConfirmDialog
+        open={confirmingRemove}
+        title="Remove from revision queue?"
+        description={`"${item.title}" will stop showing up for review. You can add it back later from the Problems table.`}
+        confirmLabel="Remove"
+        onConfirm={remove}
+        onCancel={() => setConfirmingRemove(false)}
+      />
     </div>
   );
 }
 
 function UpcomingRow({ item }: { item: RevisionQueueItem }) {
   const [pending, setPending] = useState(false);
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
   const href = safeHttpUrl(item.questionLink);
 
   async function remove() {
+    setConfirmingRemove(false);
     setPending(true);
     try {
       await setRevisionFlag(item.submissionId, false);
@@ -148,13 +161,21 @@ function UpcomingRow({ item }: { item: RevisionQueueItem }) {
         <button
           type="button"
           disabled={pending}
-          onClick={remove}
+          onClick={() => setConfirmingRemove(true)}
           title="Remove from queue"
           className="h-4 w-4 text-faint hover:text-hard disabled:opacity-50"
         >
           &times;
         </button>
       </div>
+      <ConfirmDialog
+        open={confirmingRemove}
+        title="Remove from revision queue?"
+        description={`"${item.title}" will stop showing up for review. You can add it back later from the Problems table.`}
+        confirmLabel="Remove"
+        onConfirm={remove}
+        onCancel={() => setConfirmingRemove(false)}
+      />
     </div>
   );
 }
