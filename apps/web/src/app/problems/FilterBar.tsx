@@ -54,7 +54,7 @@ export function FilterBar({
   return (
     <>
       <div className="flex flex-wrap items-center gap-2.5 px-6 pb-1 pt-5">
-        <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-btn border border-border bg-surface px-3 py-2 text-[13px] text-muted">
+        <div className="flex w-full min-w-[220px] items-center gap-2 rounded-btn border border-border bg-surface px-3 py-2 text-[13px] text-muted sm:w-auto sm:flex-1">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="7" />
             <path d="M21 21l-4.3-4.3" />
@@ -67,58 +67,60 @@ export function FilterBar({
             className="w-full bg-transparent text-ink outline-none placeholder:text-muted"
           />
         </div>
-        <select
-          className="rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink"
-          value={searchParams.get("platform") ?? ""}
-          onChange={(e) => updateParam("platform", e.target.value)}
-        >
-          <option value="">Platform: All</option>
-          <option value="leetcode">LeetCode</option>
-          <option value="manual">Manual</option>
-        </select>
-        <select
-          className="rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink"
-          value={searchParams.get("level") ?? ""}
-          onChange={(e) => updateParam("level", e.target.value)}
-        >
-          <option value="">Difficulty: All</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-        <select
-          className="rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink"
-          value={searchParams.get("pattern") ?? ""}
-          onChange={(e) => updateParam("pattern", e.target.value)}
-        >
-          <option value="">Pattern: All</option>
-          {patterns.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
-        <select
-          className="rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink"
-          value={searchParams.get("language") ?? ""}
-          onChange={(e) => updateParam("language", e.target.value)}
-        >
-          <option value="">Language: All</option>
-          {languages.map((l) => (
-            <option key={l} value={l}>
-              {l}
-            </option>
-          ))}
-        </select>
-        <select
-          className="rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink"
-          value={searchParams.get("synced") ?? ""}
-          onChange={(e) => updateParam("synced", e.target.value)}
-        >
-          <option value="">Sync: All</option>
-          <option value="true">Synced</option>
-          <option value="false">Pending</option>
-        </select>
+        <div className="grid w-full grid-cols-2 gap-2.5 sm:contents">
+          <select
+            className="w-full rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink sm:w-auto"
+            value={searchParams.get("platform") ?? ""}
+            onChange={(e) => updateParam("platform", e.target.value)}
+          >
+            <option value="">Platform: All</option>
+            <option value="leetcode">LeetCode</option>
+            <option value="manual">Manual</option>
+          </select>
+          <select
+            className="w-full rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink sm:w-auto"
+            value={searchParams.get("level") ?? ""}
+            onChange={(e) => updateParam("level", e.target.value)}
+          >
+            <option value="">Difficulty: All</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+          <select
+            className="w-full rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink sm:w-auto"
+            value={searchParams.get("pattern") ?? ""}
+            onChange={(e) => updateParam("pattern", e.target.value)}
+          >
+            <option value="">Pattern: All</option>
+            {patterns.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
+          <select
+            className="w-full rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink sm:w-auto"
+            value={searchParams.get("language") ?? ""}
+            onChange={(e) => updateParam("language", e.target.value)}
+          >
+            <option value="">Language: All</option>
+            {languages.map((l) => (
+              <option key={l} value={l}>
+                {l}
+              </option>
+            ))}
+          </select>
+          <select
+            className="w-full rounded-btn border border-border bg-surface px-2.5 py-2 text-[13px] text-ink sm:w-auto"
+            value={searchParams.get("synced") ?? ""}
+            onChange={(e) => updateParam("synced", e.target.value)}
+          >
+            <option value="">Sync: All</option>
+            <option value="true">Synced</option>
+            <option value="false">Pending</option>
+          </select>
+        </div>
       </div>
 
       {activeChips.length > 0 ? (
