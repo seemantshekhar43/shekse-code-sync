@@ -7,7 +7,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  apiBaseUrl: "http://localhost:3001",
+  apiBaseUrl: import.meta.env.PROD ? "https://api-codesync.shekse.com" : "http://localhost:3001",
   token: "",
 };
 
