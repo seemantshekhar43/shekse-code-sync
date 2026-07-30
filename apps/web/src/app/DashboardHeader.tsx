@@ -2,6 +2,7 @@ import { auth, signOut } from "../auth";
 import { disconnectInstallation } from "../lib/github-install";
 import { mintScsToken } from "../lib/scs-token";
 import { AvatarMenu } from "./AvatarMenu";
+import { MobileNav } from "./MobileNav";
 
 const navItems = [
   { href: "/", label: "Overview" },
@@ -29,13 +30,14 @@ export function DashboardHeader({
   token: string;
 }) {
   return (
-    <div className="flex items-center justify-between border-b border-border px-6 py-3.5">
-      <div className="flex items-center gap-6">
+    <div className="flex items-center justify-between border-b border-border px-4 py-3.5 sm:px-6">
+      <div className="flex items-center gap-3 sm:gap-6">
+        <MobileNav navItems={navItems} active={active} />
         <div className="flex items-center gap-2 font-serif text-base font-semibold">
           <span className="h-[9px] w-[9px] rounded-full bg-green shadow-[0_0_0_3px_var(--green-soft)]" />
           ShekseCodeSync
         </div>
-        <nav className="flex gap-5 text-sm">
+        <nav className="hidden gap-5 text-sm md:flex">
           {navItems.map((item) => (
             <a
               key={item.href}
