@@ -67,23 +67,126 @@ See [`docs/TECH_STACK.md`](docs/TECH_STACK.md) for the full stack rationale, [`d
 
 ## Getting started (local dev)
 
-Prerequisites: Node 20+, [pnpm](https://pnpm.io) (via `corepack enable pnpm`), Docker.
+Everything - API, worker, Postgres, Redis, the dashboard, and the extension - runs locally. This walks through it end to end: clone, register the two GitHub apps you need, fill in `.env`, bring up each service, and load the extension.
+
+### 1. Prerequisites
+
+- Node 20+
+- [pnpm](https://pnpm.io) via `corepack enable pnpm`
+- Docker (for Postgres + Redis, or the full `docker compose up --build` path)
+- A GitHub account (you'll register two GitHub apps below) and, if you want AI enrichment working, an API key from your AI provider of choice (Anthropic, OpenAI, or a local Ollama install)
+
+### 2. Clone and install
 
 ```bash
 git clone https://github.com/seemantshekhar43/shekse-code-sync.git
 cd shekse-code-sync
 pnpm install
-cp .env.example .env               # fill in GitHub OAuth/App creds + an AI provider key
+cp .env.example .env
+```
+
+You'll fill in `.env` in the next two steps - it starts with working defaults for `DATABASE_URL`, `REDIS_URL`, and the local ports; everything else is blank until registered.
+
+### 3. Register a GitHub OAuth App (dashboard login)
+
+The web dashboard signs users in with GitHub OAuth (Auth.js) - this is a separate registration from the GitHub App in the next step.
+
+1. Go to [github.com/settings/applications/new](https://github.com/settings/applications/new).
+2. **Application name**: anything, e.g. `ShekseCodeSync (local)`.
+3. **Homepage URL**: `http://localhost:3000`.
+4. **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`.
+5. Create it, then generate a **client secret**.
+6. Copy the values into `.env`:
+   ```bash
+   AUTH_GITHUB_ID="<client ID>"
+   AUTH_GITHUB_SECRET="<client secret>"
+   ```
+7. Generate the two Auth.js/token secrets `.env` also expects:
+   ```bash
+   openssl rand -base64 32   # -> AUTH_SECRET
+   openssl rand -base64 32   # -> SCS_TOKEN_SECRET
+   openssl rand -base64 32   # -> INTERNAL_API_SECRET
+   ```
+   Run it three times (or once and generate three different values) and paste each into its `.env` slot.
+
+### 4. Register a GitHub App (repo writes)
+
+Capture writes go straight to a GitHub repo you own via a GitHub App installation - this is what lets the API commit each problem + solution on your behalf.
+
+1. Go to [github.com/settings/apps/new](https://github.com/settings/apps/new).
+2. **GitHub App name**: anything unique, e.g. `sheksecodesync-local-<yourname>`.
+3. **Homepage URL**: `http://localhost:3000`.
+4. **Callback URL**: `http://localhost:3000/api/auth/callback/github` (only used if you enable "Request user authorization during installation" - safe to leave off for local dev).
+5. **Setup URL** (under "Post installation"): `http://localhost:3000/github/installed`, and select "Redirect on update".
+6. **Webhook**: uncheck "Active" - this project doesn't use GitHub webhooks.
+7. **Permissions** → Repository permissions → **Contents: Read and write**.
+8. **Where can this GitHub App be installed?**: "Only on this account" is fine for local dev.
+9. Create the app. On the app's settings page:
+   - Note the **App ID** and the app's **slug** (from the URL, `github.com/settings/apps/<slug>`).
+   - Under "Client secrets", generate one.
+   - Under "Private keys", generate and download a private key (`.pem` file).
+10. Copy the values into `.env`:
+    ```bash
+    GITHUB_APP_ID="<app ID>"
+    GITHUB_APP_CLIENT_ID="<client ID, shown near the top of the app's settings page>"
+    GITHUB_APP_CLIENT_SECRET="<client secret>"
+    NEXT_PUBLIC_GITHUB_APP_SLUG="<the slug>"
+    # Paste the full .pem contents, keeping the \n line breaks. Easiest via:
+    # awk 'BEGIN{ORS="\\n"} {print}' path/to/your-app.private-key.pem
+    GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----\n"
+    ```
+11. You'll install the app on a repo from inside the dashboard once it's running (step 7 below) - no need to install it manually now.
+
+### 5. Add an AI provider key
+
+Pick one in `.env` (`AI_PROVIDER` is `anthropic`, `openai`, or `ollama`; default model `claude-opus-4-8`):
+
+```bash
+AI_PROVIDER="anthropic"
+AI_MODEL="claude-opus-4-8"
+ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+Without a valid key, everything except AI enrichment still works - capture, GitHub commits, and the dashboard all function; the worker's enrichment job will just fail for that provider.
+
+### 6. Bring up Postgres, Redis, and run migrations
+
+```bash
 docker compose up -d postgres redis
 pnpm db:migrate                    # apply Prisma migrations
+```
+
+### 7. Start the API, worker, and web dashboard
+
+```bash
 pnpm dev                           # runs web, api, worker together via Turborepo
 ```
 
-- Dashboard: http://localhost:3000
-- API: http://localhost:3001
-- Extension (dev): `pnpm --filter @scs/extension dev`, then load the unpacked build in your browser. See "Installing the extension" below for a packaged build instead.
+Or run each independently in its own terminal, useful when you want isolated logs:
 
-`.env.example` documents every variable, including how to register the GitHub OAuth App and GitHub App the login and repo-write flows need. `pnpm test`, `pnpm typecheck`, and `pnpm lint` run across the whole workspace.
+```bash
+pnpm --filter @scs/api dev         # http://localhost:3001
+pnpm --filter @scs/worker dev      # BullMQ consumer, no HTTP port
+pnpm --filter @scs/web dev         # http://localhost:3000
+```
+
+Open http://localhost:3000, sign in with GitHub, and connect a repo via the "Connect GitHub repo" prompt (this installs the GitHub App from step 4 on the repo you pick). From the dashboard's avatar menu, copy your ShekseCodeSync token - the extension needs it next.
+
+### 8. Run the extension in dev mode
+
+```bash
+pnpm --filter @scs/extension dev
+```
+
+This starts WXT's dev build and opens a Chromium instance with the unpacked extension already loaded (in dev mode it points at `http://localhost:3001` instead of the production API). Click the extension icon, paste the token you copied in step 7, and solve/submit a problem on LeetCode to see it captured.
+
+Prefer a manually-loaded unpacked build instead of WXT's auto-launched browser? `pnpm --filter @scs/extension build` writes one to `apps/extension/.output/`; load that folder via `chrome://extensions` → Developer mode → Load unpacked. See "Installing the extension" below for the packaged, store-equivalent build.
+
+### All-in-one via Docker
+
+Once `.env` is filled in, `docker compose up --build` runs all five services (web, api, worker, postgres, redis) in containers instead of the steps above - see "System requirements" below for the memory Docker needs for this.
+
+`pnpm test`, `pnpm typecheck`, and `pnpm lint` run across the whole workspace at any point.
 
 ## Stack
 
