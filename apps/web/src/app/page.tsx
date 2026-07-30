@@ -98,7 +98,7 @@ export default async function HomePage({
         </div>
 
         <div className="mx-auto flex max-w-4xl flex-col gap-16 px-8 pb-24">
-          {features.map((feature) => (
+          {features.map((feature, index) => (
             <div key={feature.title}>
               <h2 className="font-serif text-xl font-semibold">{feature.title}</h2>
               <p className="mt-2 max-w-2xl text-[15px] text-muted">{feature.body}</p>
@@ -109,6 +109,7 @@ export default async function HomePage({
                   width={1280}
                   height={800}
                   className="w-full"
+                  priority={index === 0}
                 />
               </div>
             </div>
