@@ -10,7 +10,7 @@ export default defineConfig({
       48: "icon/48.png",
       128: "icon/128.png",
     },
-    permissions: ["storage", "tabs"],
+    permissions: ["storage", "activeTab"],
     // leetcode.com: content-script GraphQL pull. localhost: dev API POST.
     // api-codesync.shekse.com: prod API host, live via a Cloudflare Tunnel.
     host_permissions: [
