@@ -148,15 +148,16 @@ This is a manual step by design (start simple, automate only if it becomes frict
 
 ## Installing the extension
 
-Not yet on the Chrome Web Store - for now, install the packaged build from GitHub Releases:
+Live on the Chrome Web Store: [ShekseCodeSync](https://chromewebstore.google.com/detail/sheksecodesync/fnnpoamogllemobnepdnddagokmjicho). Install it, open the popup, and paste in your ShekseCodeSync token (from the dashboard's avatar menu) to connect it to your account. Store installs update automatically.
 
-1. Grab `scs-extension-<version>.zip` from the [latest release](https://github.com/seemantshekhar43/shekse-code-sync/releases/latest) and unzip it. (A build off the tip of `main`, not yet tagged, is available as the `extension-zip` workflow artifact on the latest successful [Build images](https://github.com/seemantshekhar43/shekse-code-sync/actions/workflows/build-images.yml) run.)
+### Testing an unreleased build
+
+To try changes off the tip of `main` before they're published to the store:
+
+1. Grab the `extension-zip` workflow artifact from the latest successful [Build images](https://github.com/seemantshekhar43/shekse-code-sync/actions/workflows/build-images.yml) run and unzip it.
 2. In Chrome (or another Chromium browser), go to `chrome://extensions`.
 3. Enable **Developer mode** (top right).
 4. Click **Load unpacked** and select the unzipped folder.
-5. Pin the extension, open the popup, and paste in your ShekseCodeSync token (from the dashboard's avatar menu) to connect it to your account.
-
-Because this isn't a store install, updates aren't automatic - repeat these steps with the newer zip when a new version ships.
 
 ## Contributing
 

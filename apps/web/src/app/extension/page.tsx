@@ -1,10 +1,7 @@
+import Image from "next/image";
 import { auth } from "../../auth";
 import { getHeaderData } from "../../lib/header-data";
-import {
-  EXTENSION_CI_BUILD_URL,
-  EXTENSION_REPO_URL,
-  getLatestExtensionRelease,
-} from "../../lib/extension-release";
+import { EXTENSION_STORE_URL } from "../../lib/extension-links";
 import { DashboardHeader } from "../DashboardHeader";
 import { TokenCopyField } from "./TokenCopyField";
 
@@ -12,50 +9,19 @@ const steps = [
   {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <rect x="5" y="7" width="14" height="12" rx="1" />
-        <path d="M12 10v5m0 0l-2.5-2.5M12 15l2.5-2.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-    title: "Unzip the download",
-    body: "Extract the .zip somewhere you'll remember.",
-  },
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <circle cx="12" cy="12" r="6.5" />
-        <path d="M12 8.5v4l2.5 1.5" strokeLinecap="round" />
-      </svg>
-    ),
-    title: "Open chrome://extensions",
-    body: (
-      <>
-        Enable <strong className="text-ink">Developer mode</strong> in the top right corner.
-      </>
-    ),
-  },
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <rect x="4" y="6" width="16" height="11" rx="1" />
-        <path d="M8 17v2h8v-2" />
-        <path d="M12 9v4.5m0 0l-2-2m2 2l2-2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-    title: "Load unpacked",
-    body: (
-      <>
-        Click <strong className="text-ink">Load unpacked</strong> and select the unzipped folder.
-      </>
-    ),
-  },
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
         <path d="M12 5l1.9 3.9 4.3.6-3.1 3 .7 4.3L12 14.8l-3.8 2 .7-4.3-3.1-3 4.3-.6z" strokeLinejoin="round" />
       </svg>
     ),
-    title: "Pin the extension",
-    body: "Click the puzzle-piece icon in Chrome's toolbar and pin ShekseCodeSync.",
+    title: "Add to Chrome",
+    body: (
+      <>
+        Install ShekseCodeSync from the{" "}
+        <a href={EXTENSION_STORE_URL} className="font-semibold text-green underline">
+          Chrome Web Store
+        </a>{" "}
+        - one click, no dev mode.
+      </>
+    ),
   },
   {
     icon: (
@@ -65,7 +31,7 @@ const steps = [
       </svg>
     ),
     title: "Paste your token",
-    body: "Open the popup and paste the token below to connect your account.",
+    body: "Open the extension's Settings and paste the token below to connect your account.",
   },
   {
     icon: (
@@ -91,10 +57,7 @@ export default async function ExtensionPage() {
     );
   }
 
-  const [headerData, release] = await Promise.all([
-    getHeaderData(session),
-    getLatestExtensionRelease(),
-  ]);
+  const headerData = await getHeaderData(session);
 
   return (
     <main className="min-h-screen bg-paper">
@@ -115,45 +78,48 @@ export default async function ExtensionPage() {
           Capture every submission <span className="text-green">[in one click]</span>.
         </h1>
         <p className="mb-7 mt-2 max-w-xl text-[14.5px] text-muted">
-          Not yet on the Chrome Web Store - install the packaged build from GitHub Releases and
-          connect it with your account token.
+          ShekseCodeSync is live on the Chrome Web Store - install it, connect your account, and
+          every accepted solution commits itself to GitHub.
         </p>
 
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-card border border-border bg-surface px-5 py-4">
           <div className="min-w-0">
-            <div className="mb-1 font-mono text-[11.5px] text-faint">
-              {release ? `LATEST RELEASE · v${release.version}` : "NO RELEASE PUBLISHED YET"}
-            </div>
-            <div className="truncate font-serif text-lg font-semibold">
-              {release?.assetName ?? "Build from the tip of main instead"}
-            </div>
+            <div className="mb-1 font-mono text-[11.5px] text-faint">CHROME WEB STORE</div>
+            <div className="truncate font-serif text-lg font-semibold">ShekseCodeSync</div>
           </div>
           <div className="flex flex-none gap-2.5">
             <a
-              href={EXTENSION_CI_BUILD_URL}
-              className="rounded-btn border border-border px-3.5 py-2.5 text-[13px] font-semibold text-muted"
+              href={EXTENSION_STORE_URL}
+              className="rounded-btn bg-green px-4 py-2.5 text-[13px] font-semibold text-white"
             >
-              Unreleased build (main)
+              Add to Chrome
             </a>
-            {release ? (
-              <a
-                href={release.downloadUrl}
-                className="rounded-btn bg-green px-4 py-2.5 text-[13px] font-semibold text-white"
-              >
-                Download .zip
-              </a>
-            ) : (
-              <a
-                href={EXTENSION_REPO_URL}
-                className="rounded-btn bg-green px-4 py-2.5 text-[13px] font-semibold text-white"
-              >
-                View on GitHub
-              </a>
-            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="overflow-hidden rounded-card border border-border shadow-sm">
+            <Image
+              src="/marketing/extension-context.png"
+              alt="ShekseCodeSync popup open on a LeetCode problem page, ready to send the accepted solution"
+              width={785}
+              height={656}
+              className="w-full"
+              priority
+            />
+          </div>
+          <div className="overflow-hidden rounded-card border border-border shadow-sm">
+            <Image
+              src="/marketing/extension-sync.png"
+              alt="ShekseCodeSync popup after sending a solved problem to GitHub"
+              width={760}
+              height={560}
+              className="w-full"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {steps.map((step, i) => (
             <div key={step.title} className="rounded-card border border-border px-[18px] py-4">
               <div className="mb-3 flex h-[42px] w-[42px] items-center justify-center rounded-full bg-green-soft font-mono text-[13px] font-bold text-green">
@@ -165,6 +131,15 @@ export default async function ExtensionPage() {
               {step.title === "Paste your token" ? (
                 <div className="mt-3">
                   <TokenCopyField token={headerData.token} />
+                  <div className="mt-3 overflow-hidden rounded-card border border-border">
+                    <Image
+                      src="/marketing/extension-settings.png"
+                      alt="ShekseCodeSync settings popup with the API base URL and account token fields"
+                      width={338}
+                      height={241}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               ) : null}
             </div>
@@ -173,10 +148,7 @@ export default async function ExtensionPage() {
 
         <div className="mt-6 flex items-start gap-2 border-t border-border pt-[18px] text-xs text-muted">
           <span className="mt-0.5 flex-none text-medium">●</span>
-          <span>
-            Not a store install, so updates aren&apos;t automatic - repeat these steps with the newer
-            .zip when a new version ships.
-          </span>
+          <span>Installed from the Chrome Web Store, so updates arrive automatically.</span>
         </div>
       </div>
     </main>
